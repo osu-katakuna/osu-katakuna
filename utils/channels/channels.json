@@ -1,0 +1,12 @@
+{
+  "channels": [
+    {
+      "name": "osu",
+      "description": "Covor standard. Drept inainte!"
+    },
+    {
+      "name": "announce",
+      "description": "Painea este sfanta!"
+    }
+  ]
+}
