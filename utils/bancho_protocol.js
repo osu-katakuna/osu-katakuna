@@ -2,6 +2,16 @@ const protocol_constants = require("./bancho_constants")
 const Int64LE = require("int64-buffer").Int64LE;
 
 function buildPacket(__packet, __packetData) {
+	if(__packetData == null) {
+		var packet = new Buffer.alloc(7);
+
+		packet.writeInt16LE(__packet, 0);
+		packet.writeInt8(0x00, 2);
+		packet.writeInt32LE(0, 3)
+
+		return packet;
+	}
+
 	var packet = new Buffer.alloc(7 + __packetData.length);
 
 	packet.writeInt16LE(__packet, 0);
@@ -208,10 +218,10 @@ function packet_parser(packet) {
 }
 
 function actionChange(packet) {
-	console.log(packet);
+	console.log(packet.data.toString("hex"));
   var actionText = read_string(packet, 1);
   var actionMD5 = read_string(packet, 2 + actionText.length);
-  var actionMods = packet.data.readUInt32LE(packet.data.length - 5);
+  var actionMods = packet.data.readInt8(packet.data.length - 9);
 
 	return {
 		"actionID": packet.data[0],
@@ -272,6 +282,134 @@ function spectateFrames(data) {
 	return buildPacket(protocol_constants.server_spectateFrames, data);
 }
 
+function botnet() {
+	return buildPacket(protocol_constants.server_topBotnet, null);
+}
+
+function spectatorPacket(packet) {
+  var frames = [];
+
+  var extra = packet.readUInt32LE(0);
+  var frame_cnt = packet.readUInt16LE(4);
+
+  var frms = packet.slice(6);
+
+  var off = 6;
+
+  for(var f = 0; f < frame_cnt; f++) {
+    off = off + 14;
+    var frame = frms.slice(f * 14, 14 * (f + 1));
+    frames.push({
+      buttonState1: frame.readInt8(0),
+      buttonState2: frame.readInt8(1),
+      mouseX: frame.readFloatLE(2),
+      mouseY: frame.readFloatLE(6),
+      time: frame.readUInt32LE(10)
+    })
+  }
+
+  var action = packet.readInt8(off);
+  var score = packet.slice(off + 1)
+
+  var score_obj = {
+    time: score.readUInt32LE(0),
+    id: score.readInt8(4),
+    count300: score.readUInt16LE(5),
+    count100: score.readUInt16LE(7),
+    count50: score.readUInt16LE(9),
+    countGeki: score.readUInt16LE(11),
+    countKatu: score.readUInt16LE(13),
+    countMiss: score.readUInt16LE(15),
+    totalScore: score.readUInt32LE(17),
+    maxCombo: score.readUInt16LE(21),
+    currentCombo: score.readUInt16LE(23),
+    perfect: score.readInt8(25),
+    currentHP: score.readUInt16LE(26),
+    tagByte: score.readInt8(29),
+    usingScoreV2: !score.readInt8(28),
+    comboPortion: 0.0,
+    bonusPortion: 0.0,
+    pass: true
+  };
+
+  if(score_obj.usingScoreV2 && score.length > 31) {
+    score_obj.comboPortion = score.readDoubleLE(30);
+    score_obj.bonusPortion = score.readDoubleLE(38);
+  }
+
+  if(score_obj.currentHP == 254) {
+    score_obj.currentHP = 0;
+    score_obj.pass = false;
+  }
+
+  return {
+    score: score_obj,
+    frames: frames,
+    extra: extra,
+    action: action
+  }
+}
+
+function spectatorPacketBuilder(score) {
+  var len = ((8 + (score.frames.length * 14)) + (score.score.usingScoreV2 ? 46 : 30));
+  var buf = new Buffer.alloc(len);
+
+  buf.writeUInt32LE(score.extra, 0);
+  buf.writeUInt16LE(score.frames.length, 4);
+
+  var frame_bfr = null;
+
+  for(var f = 0; f < score.frames.length; f++) {
+    var frame = score.frames[f];
+    var fr_buf = new Buffer.alloc(14);
+
+    fr_buf.writeInt8(frame.buttonState1, 0);
+    fr_buf.writeInt8(frame.buttonState2, 1);
+    fr_buf.writeFloatLE(frame.mouseX, 2);
+    fr_buf.writeFloatLE(frame.mouseY, 6);
+    fr_buf.writeUInt32LE(frame.time, 10);
+
+    if(frame_bfr == null) {
+      frame_bfr = fr_buf;
+    } else {
+      frame_bfr = Buffer.concat([frame_bfr, fr_buf]);
+    }
+  }
+
+  if(frame_bfr != null) {
+    frame_bfr.copy(buf, 6);
+  }
+
+  buf.writeInt8(score.action, 6 + (score.frames.length * 14));
+
+  var score_buf = new Buffer.alloc(score.score.usingScoreV2 ? 46 : 30);
+
+  score_buf.writeUInt32LE(score.score.time, 0);
+  score_buf.writeInt8(score.score.id, 4)
+  score_buf.writeUInt16LE(score.score.count300, 5)
+  score_buf.writeUInt16LE(score.score.count100, 7)
+  score_buf.writeUInt16LE(score.score.count50, 9)
+  score_buf.writeUInt16LE(score.score.countGeki, 11)
+  score_buf.writeUInt16LE(score.score.countKatu, 13)
+  score_buf.writeUInt16LE(score.score.countMiss, 15)
+  score_buf.writeUInt32LE(score.score.totalScore, 17)
+  score_buf.writeUInt16LE(score.score.maxCombo, 21)
+  score_buf.writeUInt16LE(score.score.currentCombo, 23)
+  score_buf.writeInt8(score.score.perfect, 25)
+  score_buf.writeUInt16LE(score.score.pass ? score.score.currentHP : 254, 26)
+  score_buf.writeInt8(score.score.tagByte, 28)
+  score_buf.writeInt8(score.score.usingScoreV2, 29)
+
+  if(score.score.usingScoreV2) {
+    score_buf.writeDoubleLE(score.score.comboPortion, 30);
+    score_buf.writeDoubleLE(score.score.bonusPortion, 38);
+  }
+
+  score_buf.copy(buf, 7 + (score.frames.length * 14))
+
+  return buf;
+}
+
 module.exports = {
 	"buildPacket": buildPacket,
 	"packet_parser": packet_parser,
@@ -299,7 +437,8 @@ module.exports = {
 		"removeSpectator": removeSpectator,
 		"addSpectator": addSpectator,
 		"noSongSpectate": noSongSpectate,
-		"spectateFrames": spectateFrames
+		"spectateFrames": spectateFrames,
+		"botnet": botnet
 	},
 	"parser": {
 		"publicMessage": publicMessage,

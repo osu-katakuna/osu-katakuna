@@ -97,6 +97,7 @@ router.post('/', (req, res) => {
 
 					me.spectate(host);
 					host.addSpectator(me);
+					me.spectator_data = [];
 				} else if (packet.type == protocol.constants.client_stopSpectating) {
 					var me = findOnlineUser(user.id);
 
@@ -109,10 +110,11 @@ router.post('/', (req, res) => {
 				} else if (packet.type == protocol.constants.client_spectateFrames) {
 					var host = findOnlineUser(user.id);
 					console.log(`Received spectator frames for ${host.username}(${host.user_id})...`);
-					console.log(host.spectators);
 					host.spectators.forEach((spectator) => {
 						if(spectator.user_id == host.user_id) return;
-						spectator.spectator_data.push(packet.data);
+						//cmd_queue.queueTo(spectator.token.token_id, protocol.generator.spectateFrames(packet.data));
+						spectator.spectator_data.push(protocol.generator.spectateFrames(packet.data));
+						//console.log("PACKET FRAME:", protocol.parser.spectatorPacket(packet.data))
 					});
 				} else if (packet.type == protocol.constants.client_friendAdd) {
 					var me = findOnlineUser(user.id);
@@ -141,19 +143,16 @@ router.post('/', (req, res) => {
 					}
 				}
 
-				res.write(cmd_queue.forToken(req.get("osu-token")));
 				var u = findOnlineUser(user.id);
-				if(u.spectating) {
-					if(u.spectator_data.length > 0) {
-						for(var d = (u.spectator_data.length - 1); d > 0; d--) {
-							var tmp = protocol.generator.spectateFrames(u.spectator_data[d]);
-							console.log("##################### FRAME", tmp.toString('hex'));
-							res.write(tmp);
-						}
-						u.spectator_data = [];
+				if(u && u.spectating) {
+					if(u.spectator_data && u.spectator_data.length > 25) {
+						u.spectator_data.forEach((x) => res.write(x));
+						u.spectator_data = u.spectator_data.slice(25);
 					}
 				}
-				console.log(packet);
+
+				var d = cmd_queue.forToken(req.get("osu-token"));
+				res.write(d);
 			}
 
 		} else {
