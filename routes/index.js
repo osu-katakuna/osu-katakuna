@@ -145,9 +145,9 @@ router.post('/', (req, res) => {
 
 				var u = findOnlineUser(user.id);
 				if(u && u.spectating) {
-					if(u.spectator_data && u.spectator_data.length > 25) {
+					if(u.spectator_data && u.spectator_data.length > 0) {
 						u.spectator_data.forEach((x) => res.write(x));
-						u.spectator_data = u.spectator_data.slice(25);
+						u.spectator_data = u.spectator_data.slice(u.spectator_data.length);
 					}
 				}
 
