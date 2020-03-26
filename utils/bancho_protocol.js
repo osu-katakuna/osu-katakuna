@@ -99,6 +99,13 @@ function protocolVersion(version) {
 	return buildPacket(protocol_constants.server_protocolVersion, buf)
 }
 
+function forceExit() {
+	var buf = new Buffer.alloc(4);
+	buf.writeInt32LE(128);
+
+	return new Buffer.concat([buildPacket(protocol_constants.server_ping, null), buildPacket(protocol_constants.server_supporterGMT, buf)])
+}
+
 function userSupporterGMT(supporter, GMT) {
 	var result = 1
 
@@ -410,6 +417,14 @@ function spectatorPacketBuilder(score) {
   return buf;
 }
 
+function menuIcon(url, url_direction) {
+	var data = url;
+	if(url_direction && url_direction.length > 0) {
+		data += "|" + url_direction
+	}
+	return buildPacket(protocol_constants.server_mainMenuIcon, packString(data));
+}
+
 module.exports = {
 	"buildPacket": buildPacket,
 	"packet_parser": packet_parser,
@@ -438,7 +453,9 @@ module.exports = {
 		"addSpectator": addSpectator,
 		"noSongSpectate": noSongSpectate,
 		"spectateFrames": spectateFrames,
-		"botnet": botnet
+		"botnet": botnet,
+		"forceExit": forceExit,
+		"menuIcon": menuIcon
 	},
 	"parser": {
 		"publicMessage": publicMessage,

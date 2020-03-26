@@ -57,6 +57,8 @@ function doLogin(req, res, onUserLogin, user_list) {
       if(user.friends.length > 0) {
         res.write(protocol.generator.friendList(user.friends));
       }
+
+      res.write(protocol.generator.menuIcon("https://i.imgur.com/xO6z6kJ.png", "https://talnaci-alexandru.ro"));
   } else {
       console.log(`>> Login attempt on ${username} from ${req.ip} FAILED!`)
       res.write(protocol.generator.login_fail())

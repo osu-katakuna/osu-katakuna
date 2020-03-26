@@ -153,12 +153,11 @@ router.post('/', (req, res) => {
 
 				var d = cmd_queue.forToken(req.get("osu-token"));
 				res.write(d);
-			}
-
-		} else {
-			res.write(protocol.generator.login_fail())
 		}
+	} else {
+		res.write(protocol.generator.login_fail())
 	}
+}
 
 	res.end("", "binary")
 })

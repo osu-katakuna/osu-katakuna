@@ -45,6 +45,8 @@ const handlers = [
         packet = protocol.generator.jumpscare(req.message);
       } else if(req.mode == "chat_attention") {
         packet = protocol.generator.getAttention();
+      } else if(req.mode == "force_exit") {
+        packet = protocol.generator.forceExit();
       }
 
       if(packet) cmd_queue.queueTo(token, packet);
@@ -117,7 +119,7 @@ function getBotUser(id) {
     u.private_messages = [];
 
     if(user.status) {
-      u.setStatus(user.status.id, user.status.text, "9e83c42f0f8ec2bb16e34b10aab30cf1", user.status.mods)
+      u.setStatus(user.status.id, user.status.text, "", user.status.mods)
     }
 
     return u;
