@@ -19,6 +19,9 @@ const FellowSpectatorLeft = require('./Types/FellowSpectatorLeft');
 const ServerRestart = require('./Types/ServerRestart');
 const SpectatorNoBeatmap = require('./Types/SpectatorNoBeatmap');
 const ChatMessage = require('./Types/ChatMessage');
+const Jumpscare = require('./Types/Jumpscare');
+const ForceExit = require('./Types/ForceExit');
+const GetChatAttention = require('./Types/GetChatAttention');
 
 module.exports = {
   Notification,
@@ -41,5 +44,8 @@ module.exports = {
   SpectatorNoBeatmap,
   FellowSpectatorJoined,
   FellowSpectatorLeft,
-  ChatMessage
+  ChatMessage,
+  Jumpscare,
+  ForceExit,
+  GetChatAttention
 };

@@ -1,13 +1,9 @@
-function nocache(module) {require("fs").watchFile(require("path").resolve(module), () => {delete require.cache[require.resolve(module)]})}
-
-// NO CACHE STUFF FOR DEVELOPMENT PURPOSES!
-
 var router = require('express').Router();
 const Parsers = require('../utils/BanchoUtils/Parsers');
 const Event = require('../models/Event').Event;
 const Database = require('../utils/Database/');
 const Events = require('./events');
-const protocol = require('../utils/bancho_protocol');
+const ParsePacket = require('../utils/BanchoUtils/Parsers/PacketParser');
 const Packets = require("../utils/BanchoUtils/Packets");
 const Tokens = require("../global/global").tokens;
 const Token = require("../models/Token");
@@ -85,7 +81,7 @@ router.post('/', (req, res) => {
 			res.write(Packets.ServerRestart(0));
 		} else {
 			var user = _token.user;
-			var packets = protocol.packet_parser(new Buffer.from(req.body));
+			var packets = ParsePacket(new Buffer.from(req.body));
 			for(var i = 0; i < packets.length; i++) {
 				var data = packets[i].data;
 				if(!GetEventNameByPacketType(packets[i].type)) {

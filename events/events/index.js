@@ -11,6 +11,7 @@ const CannotSpectateEvent = require('./CannotSpectateEvent');
 const JoinChatChannelEvent = require('./JoinChatChannelEvent');
 const PublicMessageEvent = require('./PublicMessageEvent');
 const PrivateMessageEvent = require('./PrivateMessageEvent');
+const PartChatChannelEvent = require('./PartChatChannelEvent');
 
 module.exports = {
   LoginEvent,
@@ -25,5 +26,6 @@ module.exports = {
   CannotSpectateEvent,
   JoinChatChannelEvent,
   PublicMessageEvent,
-  PrivateMessageEvent
+  PrivateMessageEvent,
+  PartChatChannelEvent
 };

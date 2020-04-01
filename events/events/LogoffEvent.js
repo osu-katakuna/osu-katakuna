@@ -14,11 +14,9 @@ class LogoffEvent extends Event {
   run(args) {
     const { res, user, token } = args;
 
-    if(token) {
-      token.LeaveAllChannels();
-      Tokens.RemoveToken(token.token);
-      Tokens.EnqueueAll(Packets.UserLogout(user));
-    }
+    token.LeaveAllChannels();
+    Tokens.RemoveToken(token.token);
+    Tokens.EnqueueAll(Packets.UserLogout(user));
   }
 }
 

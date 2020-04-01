@@ -30,7 +30,7 @@ function AddUserToken(user, token) {
 }
 
 function RemoveToken(token) {
-  tokens[token] = undefined;
+  tokens = tokens.filter((t) => t.token != token);
   console.log(`[i] Token '${token}' removed!`);
 }
 
