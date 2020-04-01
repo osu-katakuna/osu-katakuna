@@ -13,21 +13,20 @@ nocache("./utils/ipc");
 nocache('./routes');
 var db = require("./utils/database");
 var ipc = require("./utils/ipc");
-
-const port = 8080;
-const avatar_server_port = 8081;
+const EventHandler = require('./events/EventHandler');
+const Config = require('./global/config.json');
 
 var options = {
-  key: fs.readFileSync('/home/katakuna/key.pem'),
-  cert: fs.readFileSync('/home/katakuna/cacert.pem')
+  key: fs.readFileSync(Config.certs.key),
+  cert: fs.readFileSync(Config.certs.certificate)
 };
 
-app.set('trust proxy', 'loopback')
-avatar_app.set('trust proxy', 'loopback')
+//app.set('trust proxy', 'loopback')
+//avatar_app.set('trust proxy', 'loopback')
 
 app.use(function (req, res, next) {
   console.log(`${req.method} ${req.path} - ${req.ip} - ${new Date()} - ${req.get('User-Agent')}`)
-  if(req.get('User-Agent') != 'osu!') {
+  if(req.get('User-Agent') != 'osu!' && req.method == 'post') {
 	   res.status(400).send("Unauthorized!");
   } else {
 	req.pipe(concat(function(data){
@@ -40,7 +39,8 @@ app.use(function (err, req, res, next) {
   console.error(err.stack)
   res.status(500).send('Something broke!')
 })
-app.use(require('./routes'));
+
+app.use(EventHandler.Router);
 
 avatar_app.get("/:id", function (req, res, next) {
   if(isNaN(req.params.id)) {
@@ -74,6 +74,7 @@ avatar_app.get("/:id", function (req, res, next) {
   }
 })
 
-https.createServer(options, app).listen(port, () => console.log(`osu!katakuna listening on port ${port}`));
-https.createServer(options, avatar_app).listen(avatar_server_port, () => console.log(`osu!katakuna avatar server listening on port ${avatar_server_port}`));
-ipc.start_ipc(() => console.log("IPC server started successfully!"));
+https.createServer(options, app).listen(Config.ports.web, () => console.log(`osu!katakuna listening on port ${Config.ports.web}`));
+https.createServer(options, avatar_app).listen(Config.ports.avatar, () => console.log(`osu!katakuna avatar server listening on port ${Config.ports.avatar}`));
+if(Config.ipc == true)
+  ipc.start_ipc(() => console.log("IPC server started successfully!"));

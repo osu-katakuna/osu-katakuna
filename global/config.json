@@ -1,0 +1,17 @@
+{
+  "database": {
+    "host": "localhost",
+    "username": "katakuna",
+    "password": "ORMm8WumCg1C0a39",
+    "database": "osu_katakuna"
+  },
+  "ports": {
+    "web": 443,
+    "avatar": 80
+  },
+  "certs": {
+    "key": "./key.pem",
+    "certificate": "./cacert.pem"
+  },
+  "ipc": true
+}

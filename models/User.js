@@ -15,8 +15,6 @@ class User {
     this.latitude = 0;
     this.userRank = 4; // supporter
     this.avatar = "";
-    this.online = true;
-    this.private_messages = [];
     this.token = "";
 
     this.actionID = 0;
@@ -24,27 +22,7 @@ class User {
     this.actionMD5 = "";
     this.actionMods = 0;
 
-    this.spectating_user_id = undefined;
-    this.spectators = [];
-
-    this.spectator_data = [];
     this.friends = [];
-  }
-
-  get spectating() {
-    return this.spectating_user_id != undefined;
-  }
-
-  get whoIsSpectating() {
-    return this.spectating_user_id;
-  }
-
-  spectate(user) {
-    this.spectating_user_id = user.user_id;
-  }
-
-  stopSpectating() {
-    this.spectating_user_id = undefined;
   }
 
   addFriend(id) {
@@ -57,25 +35,6 @@ class User {
     db.removeFriend(this.user_id, id);
     this.friends = this.friends.filter((uid) => uid != id);
     cmd_queue.queueTo(this.token.token_id, protocol.generator.friendList(this.friends));
-  }
-
-  addSpectator(user) {
-    if(this.spectators.length < 1) {
-      cmd_queue.queueTo(user.token.token_id, protocol.generator.joinChatChannel("#spectator"))
-      cmd_queue.queueTo(this.token.token_id, protocol.generator.joinChatChannel("#spectator"))
-    }
-    this.spectators.push(user);
-    console.log("########### ADD SPECTATOR ##############", user);
-    cmd_queue.queueTo(this.token.token_id, protocol.generator.addSpectator(user.user_id))
-  }
-
-  removeSpectator(user) {
-    this.spectators = this.spectators.filter((u) => !(u.user_id == user.user_id));
-    cmd_queue.queueTo(user.token.token_id, protocol.generator.kickedChatChannel("#spectator"))
-    cmd_queue.queueTo(this.token.token_id, protocol.generator.removeSpectator(user.user_id))
-    if(this.spectators.length == 0) {
-      cmd_queue.queueTo(this.token.token_id, protocol.generator.kickedChatChannel("#spectator"))
-    }
   }
 
   get pp() {

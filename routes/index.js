@@ -16,6 +16,7 @@ var channel_list = require("../utils/channels/channel_list");
 var protocol = require('../utils/bancho_protocol')
 
 var user_list = [];
+var matches = [];
 
 function findOnlineUser(user_id) {
 	for(var i = 0; i < user_list.length; i++) {
@@ -132,6 +133,10 @@ router.post('/', (req, res) => {
 						me.removeFriend(user_id);
 						console.log(`User ${me.username} removed ${u.username} from their friend list!`);
 					}
+				} else if (packet.type == protocol.constants.client_createMatch) {
+					// join match?
+					// send to everyone in lobby
+					console.log("########################", protocol.parser.matchSettings(packet));
 				}
 
 				var dms = db.getPMsForUser(user.id);

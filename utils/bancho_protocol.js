@@ -357,7 +357,63 @@ function spectatorPacket(packet) {
   }
 }
 
-function spectatorPacketBuilder(score) {
+function matchSettings(packet) {
+		var match = {
+			matchID: 0,
+			inProgress: 0,
+			unknown: 0,
+			mods: 0,
+			matchName: "",
+			matchPassword: "",
+			beatmapName: "",
+			beatmapID: 0,
+			beatmapMD5: "",
+			slots: [],
+			hostUserID: 0,
+			gameMode: 0,
+			scoringType: 0,
+			teamType: 0,
+			freeMods: 0
+		};
+
+		match.matchID = packet.data.readUInt16LE(0);
+		match.inProgress = packet.data.readUInt16LE(2);
+		match.mods = packet.data.readUInt32LE(4);
+		match.matchName = read_string(packet, 8).toString();
+		match.matchPassword = read_string(packet, 10 + match.matchName.length).toString();
+		match.beatmapName = read_string(packet, 12 + match.matchName.length + match.matchPassword.length).toString();
+		match.beatmapID = packet.data.readUInt32LE(14 + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+		match.beatmapMD5 = read_string(packet, 16 + match.matchName.length + match.matchPassword.length + match.beatmapName.length).toString();
+
+		var offset = 0;
+		for(var i = 0; i < 16; i++) {
+			var status = packet.data.readInt8(52 + i + offset + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+			var team = packet.data.readInt8(68 + i + offset + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+			if (status != protocol_constants.slot_status.free && status != protocol_constants.slot_status.locked) {
+				console.log("[*] Possible user id? =>", packet.data.readInt32LE(53 + offset + i + match.matchName.length + match.matchPassword.length + match.beatmapName.length))
+				offset += 4;
+			}
+
+			match.slots.push({
+				"status": status,
+				"team": team
+			});
+		}
+
+		match.hostUserID = packet.data.readUInt32LE(68 + 16 + offset + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+		match.gameMode = packet.data.readInt8(68 + 16 + 4 + offset + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+		match.scoringType = packet.data.readInt8(68 + 16 + 4 + 1 + offset + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+		match.teamType = packet.data.readInt8(68 + 16 + 4 + 2 + offset + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+		match.freeMods = packet.data.readInt8(68 + 16 + 4 + 3 + offset + match.matchName.length + match.matchPassword.length + match.beatmapName.length);
+
+		return match;
+}
+
+function multiLobbyStats(stats) {
+	return buildPacket(protocol_constants.server_newMatch, match.getMatchData())
+}
+
+function spectatorBuilder(score) {
   var len = ((8 + (score.frames.length * 14)) + (score.score.usingScoreV2 ? 46 : 30));
   var buf = new Buffer.alloc(len);
 
@@ -459,6 +515,7 @@ module.exports = {
 	},
 	"parser": {
 		"publicMessage": publicMessage,
-		"actionChange": actionChange
+		"actionChange": actionChange,
+		"matchSettings": matchSettings
 	}
 };

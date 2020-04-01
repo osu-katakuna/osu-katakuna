@@ -9,7 +9,6 @@ npm install
 
 AND MOST IMPORTANTLY
 
-edit utils/database.js and modify USERNAME and PASSWORD with your username, respectively password of the Database.
-(this is for now, there will be a config in the future :p)
+edit global/config.json
 
 # HAVE FUN!

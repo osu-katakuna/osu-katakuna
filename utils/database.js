@@ -2,13 +2,14 @@ var sync_mysql = require('sync-mysql')
 var mysql = require('mysql')
 const ipInfo = require("node-ipinfo");
 var c = require("../utils/bancho_constants");
+const Config = require('../global/config.json');
 console.log("########################################### DATABASE INIT #################################################")
 
 var con = new sync_mysql({
-  host: "localhost",
-  user: "USERNAME",
-  password: "PASSWORD",
-  database: 'osu_katakuna'
+  host: Config.database.host,
+  user: Config.database.username,
+  password: Config.database.password,
+  database:  Config.database.database
 });
 
 function checkUser(user, pass) {
