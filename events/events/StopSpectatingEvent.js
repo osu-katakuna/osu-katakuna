@@ -8,7 +8,7 @@ const Parsers = require('../../utils/BanchoUtils/Parsers');
 class StopSpectatingEvent extends Event {
   constructor() {
     super();
-    this.name = StopSpectatingEvent;
+    this.name = "StopSpectatingEvent";
     this.type = PacketConstant.client_stopSpectating;
   }
 

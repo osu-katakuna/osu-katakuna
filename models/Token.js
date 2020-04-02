@@ -57,7 +57,9 @@ class Token {
 
   stopSpectating() {
     if(this.spectating_user == -1) return;
-    this.TokenManager.FindUserID(this.spectating_user).removeSpectator(this.user.user_id);
+    const t = this.TokenManager.FindUserID(this.spectating_user);
+    if(t)
+      t.removeSpectator(this.user.user_id);
   }
 
   removeSpectator(user_id) {
