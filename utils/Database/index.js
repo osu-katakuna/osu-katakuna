@@ -11,17 +11,22 @@ var con = new sync_mysql({
 });
 
 function GetUserFriends(user_id) {
-  return con.query("SELECT * FROM user_friendships WHERE user = ?", [user_id]);
+  return con.query("SELECT * FROM user_friendships WHERE user = ?", [user_id]).map(f => f.friend);
 }
 
 function GetUserMessages(user_id) {
   return con.query("SELECT * FROM private_message WHERE to_user_id = ? AND seen = 0", [user_id]);
 }
 
+function AddFriendForUser(user, friend) {
+  con.query("INSERT IGNORE INTO user_friendships(user, friend, created_at, updated_at) VALUES(?, ?, ?, ?)", [user.user_id, friend.user_id, getCurrentTimeDate(), getCurrentTimeDate()]);
+}
+
+function RemoveFriendForUser(user, friend) {
+  con.query("DELETE FROM user_friendships WHERE user = ? AND friend = ?", [user.user_id, friend.user_id]);
+}
+
 function SaveMessage(from, message, to) {
-  console.log("From", from);
-  console.log("To",  to);
-  console.log("Message", message);
   con.query("INSERT INTO private_message (from_user_id, to_user_id, message, seen, created_at, updated_at) VALUES (?, ?, ?, 0, ?, ?)", [from.user_id, to.user_id, message, getCurrentTimeDate(), getCurrentTimeDate()]);
 }
 
@@ -78,5 +83,7 @@ module.exports = {
   SetUserToken,
   GetUserMessages,
   SaveMessage,
-  SetMessageSeen
+  SetMessageSeen,
+  AddFriendForUser,
+  RemoveFriendForUser
 };

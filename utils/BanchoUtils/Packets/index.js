@@ -22,6 +22,7 @@ const ChatMessage = require('./Types/ChatMessage');
 const Jumpscare = require('./Types/Jumpscare');
 const ForceExit = require('./Types/ForceExit');
 const GetChatAttention = require('./Types/GetChatAttention');
+const FriendsList = require('./Types/FriendsList');
 
 module.exports = {
   Notification,
@@ -47,5 +48,6 @@ module.exports = {
   ChatMessage,
   Jumpscare,
   ForceExit,
-  GetChatAttention
+  GetChatAttention,
+  FriendsList
 };

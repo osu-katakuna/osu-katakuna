@@ -5,22 +5,22 @@ const PacketConstant = require('../../utils/BanchoUtils/Packets/PacketConstants'
 const Tokens = require("../../global/global").tokens;
 const Parsers = require('../../utils/BanchoUtils/Parsers');
 
-class SpectateEvent extends Event {
+class RemoveFriendEvent extends Event {
   constructor() {
     super();
-    this.name = "SpectateEvent";
-    this.type = PacketConstant.client_startSpectating;
+    this.name = "RemoveFriendEvent";
+    this.type = PacketConstant.client_friendRemove;
   }
 
   run(args) {
     const { user, data, token } = args;
 
-    const spectated_user = Parsers.SpectateParser(data);
-    const spectator = Tokens.FindUserID(spectated_user);
-    console.log(`[*] User ${user.username} started spectating ${spectator.user.username}.`);
+    const friend = Parsers.UserParser(data);
+    const _friend = Tokens.FindUserID(friend);
+    console.log(`[*] ${user.username} removed ${_friend.user.username} from their friend list.`);
 
-    token.spectateUser(spectated_user);
+    token.RemoveFriend(_friend.user);
   }
 }
 
-module.exports = SpectateEvent;
+module.exports = RemoveFriendEvent;

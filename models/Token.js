@@ -1,4 +1,5 @@
 const Packets = require('../utils/BanchoUtils/Packets');
+const Database = require('../utils/Database/');
 
 class Token {
   constructor(user, token, TokenManager) {
@@ -22,6 +23,25 @@ class Token {
 
   SendMessage(from, to, msg) {
     this.enqueue(Packets.ChatMessage(from, to, msg));
+  }
+
+  AddFriend(friend) {
+    if(this.user.friends.filter(x => x == friend.user_id).length > 0) {
+      console.log(`[i] Cannot add ${friend.username} as a Friend; he is already a Friend...`);
+      return;
+    }
+    this.user.friends.push(friend.user_id);
+    Database.AddFriendForUser(this.user, friend);
+    console.log(`[*] Added successfully ${friend.username} as a friend for ${this.user.username}!`);
+  }
+
+  RemoveFriend(friend) {
+    if(this.user.friends.filter(x => x == friend.user_id).length < 0) {
+      console.log(`[i] Cannot remove ${friend.username} from user's list; he is NOT a Friend...`);
+      return;
+    }
+    this.user.friends = this.user.friends.filter(x => x != friend.user_id);
+    Database.RemoveFriendForUser(this.user, friend);
   }
 
   sendToSpectators(data) {

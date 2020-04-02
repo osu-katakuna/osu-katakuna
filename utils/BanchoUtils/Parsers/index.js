@@ -3,5 +3,6 @@ module.exports = {
 	StatusParser: require('./StatusParser'),
 	SpectateParser: require('./SpectateParser'),
 	ChatChannelParser: require('./ChatChannelParser'),
-	ChatMessageParser: require('./ChatMessageParser')
+	ChatMessageParser: require('./ChatMessageParser'),
+	UserParser: require('./UserParser')
 };

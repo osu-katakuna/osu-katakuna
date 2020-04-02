@@ -5,22 +5,22 @@ const PacketConstant = require('../../utils/BanchoUtils/Packets/PacketConstants'
 const Tokens = require("../../global/global").tokens;
 const Parsers = require('../../utils/BanchoUtils/Parsers');
 
-class SpectateEvent extends Event {
+class AddFriendEvent extends Event {
   constructor() {
     super();
-    this.name = "SpectateEvent";
-    this.type = PacketConstant.client_startSpectating;
+    this.name = "AddFriendEvent";
+    this.type = PacketConstant.client_friendAdd;
   }
 
   run(args) {
     const { user, data, token } = args;
 
-    const spectated_user = Parsers.SpectateParser(data);
-    const spectator = Tokens.FindUserID(spectated_user);
-    console.log(`[*] User ${user.username} started spectating ${spectator.user.username}.`);
+    const new_friend = Parsers.UserParser(data);
+    const _friend = Tokens.FindUserID(new_friend);
+    console.log(`[*] ${user.username} added ${_friend.user.username} as a friend.`);
 
-    token.spectateUser(spectated_user);
+    token.AddFriend(_friend.user);
   }
 }
 
-module.exports = SpectateEvent;
+module.exports = AddFriendEvent;

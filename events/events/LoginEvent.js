@@ -45,6 +45,8 @@ class LoginEvent extends Event {
       res.write(Packets.UserPanel(u));
       res.write(Packets.UserStats(u));
     });
+
+    res.write(Packets.FriendsList(user.friends));
   }
 
   onLoginFailure(loginData, res) {
