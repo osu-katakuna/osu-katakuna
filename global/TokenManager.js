@@ -50,6 +50,17 @@ function OnlineUsersTokens() {
   return tokens;
 }
 
+function GetJoinedChannel(channel, user) {
+  if(channel[0] !== '#') {
+    channel = '#' + channel;
+  }
+  const u = FindUserID(user.user_id);
+  if(u) {
+      const ch = u.joinedChannels.filter(x => x.name == channel);
+      return ch.length > 0 ? ch[0] : undefined;
+  }
+}
+
 module.exports = {
   FindUsernameToken,
   AddUserToken,
@@ -60,5 +71,6 @@ module.exports = {
   FindUserID,
   EnqueueToMultiple,
   OnlineUsersTokens,
-  EnqueueAllExcept
+  EnqueueAllExcept,
+  GetJoinedChannel
 };

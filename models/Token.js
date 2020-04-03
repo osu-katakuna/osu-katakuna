@@ -1,5 +1,6 @@
 const Packets = require('../utils/BanchoUtils/Packets');
 const Database = require('../utils/Database/');
+const ChannelManager = require("../global/global").channels;
 
 class Token {
   constructor(user, token, TokenManager) {

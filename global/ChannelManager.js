@@ -19,11 +19,29 @@ function JoinChannel(channel, user) {
   if(channel[0] !== '#') {
     channel = '#' + channel;
   }
+  if(!user) return;
+  console.log(`[?] Joining channel ${channel} => ${user.user_id}`);
   GetChannel(channel).AddMember(user.user_id);
 }
 
+function LeaveChannel(channel, user) {
+  if(channel[0] !== '#') {
+    channel = '#' + channel;
+  }
+  if(!user) return;
+  console.log(`[?] Leaving channel ${channel} => ${user.user_id}`);
+  GetChannel(channel).RemoveMember(user.user_id);
+}
+
+function KickUser(channel, user) {
+  if(channel[0] !== '#') {
+    channel = '#' + channel;
+  }
+  GetChannel(channel).KickMember(user.user_id);
+}
+
 function GetAllChannelsDesc() {
-  return channels.map((channel) => {
+  return channels.filter(c => c.visibleToNormalPlayers).map((channel) => {
     return {
       name: channel.name,
       description: channel.description,
@@ -33,7 +51,7 @@ function GetAllChannelsDesc() {
 }
 
 function GetAllChannels() {
-  return channels;
+  return channels.filter(c => c.visibleToNormalPlayers);
 }
 
 function GetChannel(channel) {
@@ -45,12 +63,14 @@ function GetChannel(channel) {
   }
 }
 
-function CreateChannel(channel, description) {
+function CreateChannel(channel, description, visibleToNormalPlayers) {
   if(channel[0] !== '#') {
     channel = '#' + channel;
   }
-  channels.push(new Channel(channel, description));
-  console.log(`[i] Channel ${channel} was created!`);
+  const ch = new Channel(channel, description);
+  ch.visibleToNormalPlayers = visibleToNormalPlayers;
+  channels.push(ch);
+  console.log(`[i] Channel ${channel} was created! Invisible to players: ${visibleToNormalPlayers ? 'YES' : 'NO'}`);
 }
 
 module.exports = {
@@ -59,5 +79,7 @@ module.exports = {
   CreateChannel,
   GetAllChannelsDesc,
   GetAllChannels,
-  JoinChannel
+  JoinChannel,
+  KickUser,
+  LeaveChannel
 };

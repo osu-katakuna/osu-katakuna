@@ -2,7 +2,7 @@ const Event = require('../../models/Event').Event;
 const Database = require('../../utils/Database/');
 const Packets = require('../../utils/BanchoUtils/Packets');
 const Tokens = require("../../global/global").tokens;
-const Channels = require("../../global/global").channels;
+const ChannelManager = require("../../global/global").channels;
 
 class LoginEvent extends Event {
   constructor() {
@@ -37,9 +37,9 @@ class LoginEvent extends Event {
     Tokens.EnqueueAllExcept(user.user_id, Packets.UserPanel(user));
     Tokens.EnqueueAllExcept(user.user_id, Packets.UserStats(user));
 
-    Channels.GetAllChannelsDesc().forEach((d) => res.write(Packets.ChannelInfo(d)));
-    Channels.JoinChannel("#osu", user);
-    Channels.JoinChannel("#announce", user);
+    ChannelManager.GetAllChannelsDesc().forEach((d) => res.write(Packets.ChannelInfo(d)));
+    ChannelManager.JoinChannel("#osu", user);
+    ChannelManager.JoinChannel("#announce", user);
 
     Tokens.OnlineUsers().forEach((u) => {
       res.write(Packets.UserPanel(u));

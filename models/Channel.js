@@ -9,19 +9,27 @@ class Channel {
 	  }
 		this.name = name;
 		this.description = desc;
+		this.visibleToNormalPlayers = true;
 	}
 
 	SendMessage(message, from) {
 		this.members.forEach((id) => {
 			if(id == from.user_id) return;
+			console.log(id);
 			TokenManager.FindUserID(id).SendMessage(from, this.name, message)
 		});
 	}
 
 	AddMember(user_id) {
 		for(var i = 0; i < this.members.length; i++) {
-			if(this.members[i] == user_id) return;
+			if(this.members[i] == user_id) {
+				TokenManager.FindUserID(user_id).enqueue(Packets.JoinChatChannel(this.name));
+				TokenManager.FindUserID(user_id).joinedChannels.push(this);
+				TokenManager.EnqueueAll(Packets.ChannelInfo({name: this.name, description: this.description, members: this.members.length}));
+				return;
+			}
 		}
+		
 		this.members.push(user_id);
 		TokenManager.FindUserID(user_id).enqueue(Packets.JoinChatChannel(this.name));
 		TokenManager.FindUserID(user_id).joinedChannels.push(this);
@@ -31,7 +39,8 @@ class Channel {
 	RemoveMember(user_id) {
 		this.members = this.members.filter((u) => u != user_id);
 		const curr_user = TokenManager.FindUserID(user_id);
-		curr_user.joinedChannels = curr_user.joinedChannels.filter((x) => x.name != this.name);
+		if(curr_user)
+			curr_user.joinedChannels = curr_user.joinedChannels.filter(x => x.name != this.name);
 	}
 
 	KickMember(user_id) {

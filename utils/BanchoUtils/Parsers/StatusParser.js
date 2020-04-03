@@ -3,7 +3,7 @@ const { ReadString } = require('../Packets/Utils');
 module.exports = (packet) => {
   var actionText = ReadString(packet, 0);
   var actionMD5 = ReadString(packet, 2 + actionText.length);
-  var actionMods = packet.readInt8(packet.length - 9);
+  var actionMods = packet.readInt16LE(packet.length - 9);
 
   return {
     "actionID": packet[0],

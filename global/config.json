@@ -7,7 +7,7 @@
   },
   "ports": {
     "web": 443,
-    "avatar": 80
+    "avatar": 444
   },
   "certs": {
     "key": "./key.pem",
