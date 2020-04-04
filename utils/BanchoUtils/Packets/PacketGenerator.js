@@ -1,5 +1,6 @@
 const { PackString, ReadString } = require('./Utils');
-const Int64LE = require("int64-buffer").Int64LE;
+const Int64 = require("int64-buffer").Int64LE;
+const UInt64 = require("int64-buffer").Uint64LE;
 
 const Type = {
   String: 0,
@@ -9,12 +10,13 @@ const Type = {
   Int64: 4,
   Float: 5,
   Int16: 6,
-  UInt32: 7
+  UInt32: 7,
+  UInt64: 8,
 };
 
 function TypeSizeCalculator(type, data) {
   if(type == Type.String)
-    return 2 + data.length;
+    return PackString(data).length;
   else if(type == Type.Byte)
     return 1;
   else if(type == Type.Raw)
@@ -25,7 +27,7 @@ function TypeSizeCalculator(type, data) {
     return 2;
   else if(type == Type.Float)
     return 4;
-  else if(type == Type.Int64)
+  else if(type == Type.Int64 || type == Type.UInt64)
     return 8;
 }
 
@@ -36,6 +38,7 @@ function BuildPacket(__packet) {
   var packet = new Buffer.alloc(7 + data_size);
 
   var offset = 7; // start at 7
+  var x = 0;
   packet.writeInt16LE(__packet.type, 0); // packet type
   packet.writeInt8(0x00, 2);
   packet.writeInt32LE(data_size, 3); // data_size
@@ -53,12 +56,14 @@ function BuildPacket(__packet) {
       packet.writeInt16LE(p.value, offset);
     else if(p.type == Type.Float)
       packet.writeFloatLE(p.value, offset);
-    else if(p.type == Type.Int64) {
-      const v = new Int64LE(p.value).toBuffer();
-      v.copy(packet, offset);
-    } else if(p.type == Type.Raw)
+    else if(p.type == Type.Int64)
+      new Int64(p.value).toBuffer().copy(packet, offset);
+    else if(p.type == Type.UInt64)
+      new UInt64(p.value).toBuffer().copy(packet, offset);
+    else if(p.type == Type.Raw)
       new Buffer.from(p.value).copy(packet, offset);
     offset += TypeSizeCalculator(p.type, p.value)
+    x++;
   });
 
   return packet;

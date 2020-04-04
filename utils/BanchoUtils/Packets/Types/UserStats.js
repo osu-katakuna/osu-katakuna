@@ -5,7 +5,7 @@ module.exports = (user) => PacketGenerator.BuildPacket({
   type: PacketConstant.server_userStats,
   data: [
     {
-      type: PacketGenerator.Type.UInt32,
+      type: PacketGenerator.Type.Int32,
       value: user.user_id
     },
     {
@@ -21,7 +21,7 @@ module.exports = (user) => PacketGenerator.BuildPacket({
       value: user.stats.status.actionMD5
     },
     {
-      type: PacketGenerator.Type.Int32,
+      type: PacketGenerator.Type.UInt32,
       value: user.stats.status.actionMods
     },
     {
@@ -50,7 +50,7 @@ module.exports = (user) => PacketGenerator.BuildPacket({
     },
     {
       type: PacketGenerator.Type.Int32,
-      value: user.stats.gameRank
+      value: 127
     },
     {
       type: PacketGenerator.Type.Int16,

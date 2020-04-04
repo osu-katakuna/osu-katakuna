@@ -23,6 +23,9 @@ const Jumpscare = require('./Types/Jumpscare');
 const ForceExit = require('./Types/ForceExit');
 const GetChatAttention = require('./Types/GetChatAttention');
 const FriendsList = require('./Types/FriendsList');
+const MatchTransferHost = require('./Types/MatchTransferHost');
+const MatchInfo = require('./Types/MatchInfo');
+const NewMatchInfo = require('./Types/NewMatchInfo');
 
 module.exports = {
   Notification,
@@ -49,5 +52,8 @@ module.exports = {
   Jumpscare,
   ForceExit,
   GetChatAttention,
-  FriendsList
+  FriendsList,
+  MatchTransferHost,
+  MatchInfo,
+  NewMatchInfo
 };

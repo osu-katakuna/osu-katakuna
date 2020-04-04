@@ -30,8 +30,8 @@ function ReadString(packet, offset) {
 }
 
 function PackString(str) {
-	if(str.length == 0 || str == undefined)
-		return new Buffer.from([0x0b, 0x00]);
+	if(str == null || str == '')
+		return new Buffer.from([0x00]);
 	else {
 		return new Buffer.concat([new Buffer.from([0x0B]),
 		uleb128Encode(str.length),
