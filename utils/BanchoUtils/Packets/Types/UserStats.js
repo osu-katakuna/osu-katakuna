@@ -50,7 +50,7 @@ module.exports = (user) => PacketGenerator.BuildPacket({
     },
     {
       type: PacketGenerator.Type.Int32,
-      value: 127
+      value: user.stats.gameRank
     },
     {
       type: PacketGenerator.Type.Int16,
