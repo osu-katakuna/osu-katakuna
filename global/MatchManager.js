@@ -22,11 +22,40 @@ function GetMatch(id) {
   return matches.filter(m => m.id == id)[0];
 }
 
+function GetUserJoinedMatch(user) {
+  for(var i = 0; i < matches.length; i++) {
+    for(var j = 0; j < 16; j++)
+      if(matches[i].GetSlot(j).userID == user.user_id) return matches[i];
+  }
+}
+
 function GetRandomMatchID() {
   var m = 1;
   while(true) {
     if(!GetMatch(m)) return m;
     m++;
+  }
+}
+
+function UpdateMatch(user, match_data) {
+  if(match_data.id == undefined) match_data.id = GetUserJoinedMatch(user).id;
+  if(GetMatch(match_data.id)) {
+    const m = GetMatch(match_data.id);
+
+    if(user.user_id != m.hostUserID) {
+      console.log(`[X] Could not update match #${match_data.id}: you are not the host!`);
+      return;
+    }
+
+    m.name = match_data.name;
+    m.hostUserID = match_data.hostUserID;
+    m.password = match_data.password == "" ? null : match_data.password;
+    m.beatmapName = match_data.beatmapName;
+    m.beatmapMD5 = match_data.beatmapMD5;
+    m.beatmapID = match_data.beatmapMD5 == "" ? 0 : match_data.beatmapID;
+    m.SendUpdate();
+  } else {
+    console.log(`[X] Could not update inexistent match #${match_data.id}!`);
   }
 }
 
@@ -64,13 +93,14 @@ function JoinMatch(user, match_id, password) {
       console.log(`[i] ${user.username} joined #${match.id}!`);
     }
   } else {
+    TokenManager.FindUserID(user.user_id).enqueue(Packets.MatchJoinFailure());
     console.log(`[X] ${user.username} tried to join an inexistent match #${match.id}.`);
   }
 }
 
 function LeaveMatch(user, match_id) {
-  if(GetMatch(id)) {
-
+  if(GetUserJoinedMatch(user)) {
+    GetUserJoinedMatch(user).RemoveUser(user);
   }
 }
 
@@ -97,5 +127,6 @@ module.exports = {
   matches,
   CreateMatch,
   JoinMatch,
-  LeaveMatch
+  LeaveMatch,
+  UpdateMatch
 };

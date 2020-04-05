@@ -71,8 +71,8 @@ function ParseDataFromTemplate(data, template) {
       obj[x.parameter] = Parse(NewData, x).data;
       offset += Parse(NewData, x).offset;
     } else {
-      obj[x.parameter] = x.condition(Parse(NewData, x).data, obj, i) == true ? Parse(NewData, x).data : null; // run condition then evaluate the contents.
-      offset += x.condition(Parse(NewData, x).data, obj, i) == true ? Parse(NewData, x).offset : 0;
+      obj[x.parameter] = x.condition(Parse(NewData, x).data, obj) == true ? Parse(NewData, x).data : null; // run condition then evaluate the contents.
+      offset += x.condition(Parse(NewData, x).data, obj) == true ? Parse(NewData, x).offset : 0;
     }
   });
 

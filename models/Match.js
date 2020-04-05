@@ -57,6 +57,23 @@ class Match {
     }
   }
 
+  RemoveUser(user) {
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) {
+        const slot = this.GetSlot(s);
+        slot.status = SlotStatus.Free;
+        slot.userID = 0;
+        slot.mods = 0;
+        slot.team = 0;
+        this.SetSlot(s, slot);
+
+        console.log(`[i] [MP-${this.id}] ${user.username} left the room.`);
+        this.SendUpdate();
+        break;
+      }
+    }
+  }
+
   SetHost(user) {
     this.hostUserID = user.user_id;
     const u = TokenManager.FindUserID(user.user_id);
@@ -89,6 +106,10 @@ class Match {
   SendUpdate() {
     console.log(`[i] [MP-${this.id}] Send update!`);
     TokenManager.EnqueueToMultiple(PlayersInLobby, Packets.MatchInfo(this));
+    this.slots.forEach(slot => {
+      if(slot.status != SlotStatus.Free && slot.status != SlotStatus.Locked)
+        TokenManager.FindUserID(slot.userID).enqueue(Packets.MatchInfo(this));
+    });
     TokenManager.FindUserID(this.hostUserID).enqueue(Packets.MatchInfo(this));
   }
 

@@ -17,7 +17,7 @@ const data_template = [
     template: [
       { parameter: "status", type: Type.Byte },
       { parameter: "team", type: Type.Byte },
-      { parameter: "id", type: Type.UInt32, condition: (v, obj, i) => (obj.slots[i].status != SlotStatus.Free && obj.slots[i].status != SlotStatus.Locked) }
+      { parameter: "id", type: Type.UInt32, condition: (v, obj, i) => (obj.slots[i].status == SlotStatus.Free && obj.slots[i].status == SlotStatus.Locked) }
     ],
     length: 16
   },

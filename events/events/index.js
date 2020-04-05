@@ -18,6 +18,8 @@ const JoinLobbyEvent = require('./JoinLobbyEvent');
 const PartLobbyEvent = require('./PartLobbyEvent');
 const CreateMatchEvent = require('./CreateMatchEvent');
 const JoinMatchEvent = require('./JoinMatchEvent');
+const LeaveMatchEvent = require('./LeaveMatchEvent');
+const ChangeMatchSettingsEvent = require('./ChangeMatchSettingsEvent');
 
 module.exports = {
   LoginEvent,
@@ -39,5 +41,7 @@ module.exports = {
   JoinLobbyEvent,
   PartLobbyEvent,
   CreateMatchEvent,
-  JoinMatchEvent
+  JoinMatchEvent,
+  LeaveMatchEvent,
+  ChangeMatchSettingsEvent
 };
