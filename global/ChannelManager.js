@@ -41,7 +41,7 @@ function KickUser(channel, user) {
 }
 
 function GetAllChannelsDesc() {
-  return channels.filter(c => c.visibleToNormalPlayers).map((channel) => {
+  return channels.filter(c => c.visibleToNormalPlayers && c.description != undefined).map((channel) => {
     return {
       name: channel.name,
       description: channel.description,
@@ -70,7 +70,7 @@ function CreateChannel(channel, description, visibleToNormalPlayers) {
   const ch = new Channel(channel, description);
   ch.visibleToNormalPlayers = visibleToNormalPlayers;
   channels.push(ch);
-  console.log(`[i] Channel ${channel} was created! Invisible to players: ${visibleToNormalPlayers ? 'YES' : 'NO'}`);
+  console.log(`[i] Channel ${channel} was created! Visible to players: ${visibleToNormalPlayers ? 'YES' : 'NO'}`);
 }
 
 module.exports = {

@@ -25,15 +25,17 @@ class Channel {
 			if(this.members[i] == user_id) {
 				TokenManager.FindUserID(user_id).enqueue(Packets.JoinChatChannel(this.name));
 				TokenManager.FindUserID(user_id).joinedChannels.push(this);
-				TokenManager.EnqueueAll(Packets.ChannelInfo({name: this.name, description: this.description, members: this.members.length}));
+				if(this.description !== undefined)
+					TokenManager.EnqueueAll(Packets.ChannelInfo({name: this.name, description: this.description, members: this.members.length}));
 				return;
 			}
 		}
-		
+
 		this.members.push(user_id);
 		TokenManager.FindUserID(user_id).enqueue(Packets.JoinChatChannel(this.name));
 		TokenManager.FindUserID(user_id).joinedChannels.push(this);
-		TokenManager.EnqueueAll(Packets.ChannelInfo({name: this.name, description: this.description, members: this.members.length}));
+		if(this.description !== undefined)
+			TokenManager.EnqueueAll(Packets.ChannelInfo({name: this.name, description: this.description, members: this.members.length}));
 	}
 
 	RemoveMember(user_id) {

@@ -14,6 +14,10 @@ const PrivateMessageEvent = require('./PrivateMessageEvent');
 const PartChatChannelEvent = require('./PartChatChannelEvent');
 const AddFriendEvent = require('./AddFriendEvent');
 const RemoveFriendEvent = require('./RemoveFriendEvent');
+const JoinLobbyEvent = require('./JoinLobbyEvent');
+const PartLobbyEvent = require('./PartLobbyEvent');
+const CreateMatchEvent = require('./CreateMatchEvent');
+const JoinMatchEvent = require('./JoinMatchEvent');
 
 module.exports = {
   LoginEvent,
@@ -31,5 +35,9 @@ module.exports = {
   PrivateMessageEvent,
   PartChatChannelEvent,
   AddFriendEvent,
-  RemoveFriendEvent
+  RemoveFriendEvent,
+  JoinLobbyEvent,
+  PartLobbyEvent,
+  CreateMatchEvent,
+  JoinMatchEvent
 };

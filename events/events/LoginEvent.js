@@ -32,6 +32,7 @@ class LoginEvent extends Event {
     res.write(Packets.UserSupporterGMT(user));
     res.write(Packets.UserPanel(user));
     res.write(Packets.UserStats(user));
+    console.log(user, user.rank, Packets.UserStats(user).toString("hex").toUpperCase())
     res.write(Packets.ChannelInfoEnd());
 
     Tokens.EnqueueAllExcept(user.user_id, Packets.UserPanel(user));
@@ -41,7 +42,7 @@ class LoginEvent extends Event {
     ChannelManager.JoinChannel("#osu", user);
     ChannelManager.JoinChannel("#announce", user);
 
-    Tokens.OnlineUsers().forEach((u) => {
+    Tokens.OnlineUsers().filter(u => u.user_id != user.user_id).forEach((u) => {
       res.write(Packets.UserPanel(u));
       res.write(Packets.UserStats(u));
     });

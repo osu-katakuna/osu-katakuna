@@ -25,6 +25,8 @@ const GetChatAttention = require('./Types/GetChatAttention');
 const FriendsList = require('./Types/FriendsList');
 const MatchTransferHost = require('./Types/MatchTransferHost');
 const MatchInfo = require('./Types/MatchInfo');
+const MatchJoinFailure = require('./Types/MatchJoinFailure');
+const MatchJoinSuccess = require('./Types/MatchJoinSuccess');
 const NewMatchInfo = require('./Types/NewMatchInfo');
 
 module.exports = {
@@ -55,5 +57,7 @@ module.exports = {
   FriendsList,
   MatchTransferHost,
   MatchInfo,
-  NewMatchInfo
+  NewMatchInfo,
+  MatchJoinFailure,
+  MatchJoinSuccess
 };

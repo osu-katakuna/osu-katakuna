@@ -4,5 +4,7 @@ module.exports = {
 	SpectateParser: require('./SpectateParser'),
 	ChatChannelParser: require('./ChatChannelParser'),
 	ChatMessageParser: require('./ChatMessageParser'),
-	UserParser: require('./UserParser')
+	UserParser: require('./UserParser'),
+	MatchInformation: require('./MatchInformation'),
+	MatchJoinData: require('./MatchJoinData')
 };

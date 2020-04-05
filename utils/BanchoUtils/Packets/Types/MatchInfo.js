@@ -2,7 +2,6 @@ const PacketGenerator = require('../PacketGenerator');
 const PacketConstant = require('../PacketConstants');
 
 module.exports = (match) => {
-  console.log(match);
   var data = [
     {
       type: PacketGenerator.Type.Int16,
@@ -103,8 +102,6 @@ module.exports = (match) => {
     type: PacketGenerator.Type.UInt32,
     value: match.seed
   });
-
-  console.log(data);
 
   return PacketGenerator.BuildPacket({
     type: PacketConstant.server_updateMatch,

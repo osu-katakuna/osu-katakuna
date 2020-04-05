@@ -2,6 +2,7 @@ const Event = require('../../models/Event').Event;
 const PacketConstant = require('../../utils/BanchoUtils/Packets/PacketConstants');
 const PacketParser = require('../../utils/BanchoUtils/Parsers');
 const ChannelManager = require("../../global/global").channels;
+const MatchManager = require("../../global/global").matches;
 
 class JoinChatChannelEvent extends Event {
   constructor() {
@@ -15,7 +16,13 @@ class JoinChatChannelEvent extends Event {
 
     const channel = PacketParser.ChatChannelParser(data);
     console.log(`[*] User ${user.username} joins the ${channel} chat channel!`);
-    ChannelManager.JoinChannel(channel, user);
+
+    if(channel === "#spectator" && token.spectating_user == -1)
+      ChannelManager.KickUser("#spectator", user);
+    else if(channel === "#lobby" && !MatchManager.PlayerInLobby(user))
+      ChannelManager.KickUser("#lobby", user);
+    else
+      ChannelManager.JoinChannel(channel, user);
   }
 }
 

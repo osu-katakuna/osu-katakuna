@@ -1,15 +1,12 @@
-const { ReadString } = require('../Packets/Utils');
+const Parser = require('./Parser');
+const { Type } = require('../Utils/PacketUtils');
 
-module.exports = (packet) => {
-  var actionText = ReadString(packet, 0);
-  var actionMD5 = ReadString(packet, 2 + actionText.length);
-  var actionMods = packet.readInt16LE(packet.length - 9);
+const data_template = [
+  { parameter: "actionID", type: Type.Byte },
+  { parameter: "actionText", type: Type.String },
+  { parameter: "actionMD5", type: Type.String },
+  { parameter: "actionMods", type: Type.UInt32 },
+  { parameter: "gameMode", type: Type.Byte }
+];
 
-  return {
-    "actionID": packet[0],
-    "actionText": actionText,
-    "actionMD5": actionMD5,
-    "actionMods": actionMods,
-    "gameMode": packet[packet.length - 1]
-  };
-}
+module.exports = (data) => Parser.ParseDataFromTemplate(data, data_template);

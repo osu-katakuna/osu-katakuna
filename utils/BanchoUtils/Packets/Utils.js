@@ -20,11 +20,12 @@ function uleb128Encode(num) {
 function ReadString(packet, offset) {
     var p = packet.slice(offset);
 
+		if(p[0] == 0x00) return "";
     if(p[0] == 0x0B) {
         if(p[1] == 0x00)
-          return new Buffer.from([0x00]);
+          return "";
         else
-          return p.slice(2, 2 + p[1]);
+          return p.slice(2, 2 + p[1]).toString();
     } else
 			return ReadString(packet, offset + 1);
 }
