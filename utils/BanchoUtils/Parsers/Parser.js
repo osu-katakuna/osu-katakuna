@@ -39,12 +39,39 @@ function Parse(value, p) {
   return { data, offset };
 }
 
+function CalculateOffset(data, template) {
+  var offset = 0;
+
+  template.forEach(x => {
+    const NewData = data.slice(offset);
+
+    if(x.type === Type.ArrayOfValues) {
+      x.template.forEach(template => {
+        for(var i = 0; i < x.length; i++) {
+          if(template.condition != undefined)
+            offset += template.condition(Parse(NewData, template).data, obj, i) == false ? Parse(NewData, template).offset : 1;
+          else
+            offset += Parse(NewData, template).offset;
+        }
+      });
+      return;
+    }
+
+    if(x.condition == undefined)
+      offset += Parse(NewData, x).offset;
+    else
+      offset += x.condition(Parse(NewData, x).data, obj) == true ? Parse(NewData, x).offset : 0;
+  });
+
+  return offset;
+}
+
 function ParseDataFromTemplate(data, template) {
   var obj = {};
   var offset = 0;
 
   template.forEach(x => {
-    const NewData = data.slice(offset);
+    var NewData = data.slice(offset);
 
     if(x.type === Type.ArrayOfValues) {
       x.template.forEach(template => {
@@ -54,13 +81,14 @@ function ParseDataFromTemplate(data, template) {
           if(!obj[x.parameter][i])
             obj[x.parameter][i] = {} ; // create empty object
           if(template.condition != undefined) {
-            obj[x.parameter][i][template.parameter] = template.condition(Parse(NewData, template).data, obj, i) == true ? Parse(NewData, template).data : null; // run condition then evaluate the contents.
-            offset += template.condition(Parse(NewData, template).data, obj, i) == true ? Parse(NewData, template).offset : 0;
-            // true = show parsed value
-            // false = null
+            obj[x.parameter][i][template.parameter] = template.condition(Parse(NewData, template).data, obj, i) == false ? Parse(NewData, template).data : null; // run condition then evaluate the contents.
+            offset += template.condition(Parse(NewData, template).data, obj, i) == false ? Parse(NewData, template).offset : 1;
+            // false = show parsed value
+            // true = null
           } else {
             obj[x.parameter][i][template.parameter] = Parse(NewData, template).data; // set value of that object
             offset += Parse(NewData, template).offset;
+            NewData = data.slice(offset);
           }
         }
       });
@@ -80,5 +108,6 @@ function ParseDataFromTemplate(data, template) {
 }
 
 module.exports = {
-  ParseDataFromTemplate
+  ParseDataFromTemplate,
+  CalculateOffset
 };

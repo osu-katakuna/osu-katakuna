@@ -10,6 +10,7 @@ const PlayersInLobby = require('../global/GlobalLobbyPlayers').PlayersInLobby;
 class Match {
   constructor() {
     this.id = -1;
+    this.deleted = false;
     this.inProgress = false;
     this.mods = 0;
     this.name = "";
@@ -62,16 +63,30 @@ class Match {
       if(this.slots[s].userID == user.user_id) {
         const slot = this.GetSlot(s);
         slot.status = SlotStatus.Free;
-        slot.userID = 0;
+        slot.userID = -1;
         slot.mods = 0;
         slot.team = 0;
         this.SetSlot(s, slot);
 
         console.log(`[i] [MP-${this.id}] ${user.username} left the room.`);
         this.SendUpdate();
+
+        if(user.user_id == this.hostUserID) {
+          console.log(`[i] [MP-${this.id}] Host left the room. Giving host privilege to another player...`);
+          for(var i = 0; i < 16; i++) {
+            if(this.slots[i].status != SlotStatus.Free && this.slots[i].status != SlotStatus.Locked) {
+              this.SetHost(TokenManager.FindUserID(this.slots[i].userID).user);
+              break;
+            }
+          }
+        }
         break;
       }
     }
+  }
+
+  get OnlinePlayers() {
+    return this.slots.filter(slot => slot.status != SlotStatus.Free && slot.status != SlotStatus.Locked).length;
   }
 
   SetHost(user) {
@@ -79,6 +94,16 @@ class Match {
     const u = TokenManager.FindUserID(user.user_id);
     u.enqueue(Packets.MatchTransferHost());
     console.log(`[i] [MP-${this.id}] New host: ${user.username}`);
+    this.SendUpdate();
+  }
+
+  UpdatePassword(password) {
+    this.password = password;
+    this.slots.forEach(slot => {
+      if(slot.status != SlotStatus.Free && slot.status != SlotStatus.Locked && slot.userID > 0)
+        TokenManager.FindUserID(slot.userID).enqueue(Packets.UpdatePassword(this.password));
+    });
+    this.SendUpdate();
   }
 
   SetSlot(slot, slot_data) {
@@ -92,25 +117,17 @@ class Match {
   }
 
   GetSlot(slot) {
-    return {
-      status: this.slots[slot].status,
-      team: this.slots[slot].team,
-      userID: this.slots[slot].userID,
-      mods: this.slots[slot].mods,
-      loaded: this.slots[slot].loaded,
-      skip: this.slots[slot].skip,
-      complete: this.slots[slot].complete
-    };
+    return this.slots[slot];
   }
 
   SendUpdate() {
     console.log(`[i] [MP-${this.id}] Send update!`);
-    TokenManager.EnqueueToMultiple(PlayersInLobby, Packets.MatchInfo(this));
+    TokenManager.EnqueueToMultiple(PlayersInLobby.filter(x => x != this.hostUserID), Packets.MatchInfo(this));
     this.slots.forEach(slot => {
-      if(slot.status != SlotStatus.Free && slot.status != SlotStatus.Locked)
+      if(slot.status != SlotStatus.Free && slot.status != SlotStatus.Locked && slot.userID > 0)
         TokenManager.FindUserID(slot.userID).enqueue(Packets.MatchInfo(this));
     });
-    TokenManager.FindUserID(this.hostUserID).enqueue(Packets.MatchInfo(this));
+    console.log(this);
   }
 
   SetSlotMods(slot, mods) {

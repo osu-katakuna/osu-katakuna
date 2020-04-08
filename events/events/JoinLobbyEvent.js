@@ -2,9 +2,9 @@ const Event = require('../../models/Event').Event;
 const Database = require('../../utils/Database/');
 const Packets = require('../../utils/BanchoUtils/Packets');
 const PacketConstant = require('../../utils/BanchoUtils/Packets/PacketConstants');
-const Tokens = require("../../global/global").tokens;
-const ChannelManager = require("../../global/global").channels;
-const MatchManager = require("../../global/global").matches;
+var Tokens = require("../../global/global").tokens;
+var ChannelManager = require("../../global/global").channels;
+var MatchManager = require("../../global/global").matches;
 
 class JoinLobbyEvent extends Event {
   constructor() {
@@ -21,7 +21,7 @@ class JoinLobbyEvent extends Event {
     ChannelManager.JoinChannel("#lobby", user);
     MatchManager.JoinLobby(user);
 
-    MatchManager.matches.forEach(m => {
+    MatchManager.GetAllMatches().forEach(m => {
       token.enqueue(Packets.NewMatchInfo(m));
       console.log(m);
     });

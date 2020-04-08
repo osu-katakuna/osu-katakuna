@@ -1,12 +1,12 @@
 const PacketGenerator = require('../PacketGenerator');
 const PacketConstant = require('../PacketConstants');
 
-module.exports = () => PacketGenerator.BuildPacket({
-  type: PacketConstant.server_channelInfoEnd,
+module.exports = (match) => PacketGenerator.BuildPacket({
+  type: PacketConstant.server_disposeMatch,
   data: [
     {
       type: PacketGenerator.Type.Int32,
-      value: 0
+      value: match.id
     }
   ]
 });

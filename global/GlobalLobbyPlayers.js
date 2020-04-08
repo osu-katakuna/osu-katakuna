@@ -1,5 +1,7 @@
 var PlayersInLobby = [];
+var Matches = [];
 
 module.exports = {
-  PlayersInLobby
+  PlayersInLobby,
+  Matches
 }

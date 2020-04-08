@@ -28,6 +28,9 @@ const MatchInfo = require('./Types/MatchInfo');
 const MatchJoinFailure = require('./Types/MatchJoinFailure');
 const MatchJoinSuccess = require('./Types/MatchJoinSuccess');
 const NewMatchInfo = require('./Types/NewMatchInfo');
+const DisposeMatch = require('./Types/DisposeMatch');
+const UpdatePassword = require('./Types/UpdatePassword');
+const InviteMessage = require('./Types/InviteMessage');
 
 module.exports = {
   Notification,
@@ -59,5 +62,8 @@ module.exports = {
   MatchInfo,
   NewMatchInfo,
   MatchJoinFailure,
-  MatchJoinSuccess
+  MatchJoinSuccess,
+  DisposeMatch,
+  UpdatePassword,
+  InviteMessage
 };

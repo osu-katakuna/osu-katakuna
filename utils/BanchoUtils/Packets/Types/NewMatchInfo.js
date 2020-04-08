@@ -2,6 +2,7 @@ const PacketGenerator = require('../PacketGenerator');
 const PacketConstant = require('../PacketConstants');
 
 module.exports = (match) => {
+  console.log(match);
   var data = [
     {
       type: PacketGenerator.Type.Int16,
@@ -25,7 +26,7 @@ module.exports = (match) => {
     },
     {
       type: PacketGenerator.Type.String,
-      value: match.password
+      value: match.password == null ? "" : "true"
     },
     {
       type: PacketGenerator.Type.String,

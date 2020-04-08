@@ -20,6 +20,9 @@ const CreateMatchEvent = require('./CreateMatchEvent');
 const JoinMatchEvent = require('./JoinMatchEvent');
 const LeaveMatchEvent = require('./LeaveMatchEvent');
 const ChangeMatchSettingsEvent = require('./ChangeMatchSettingsEvent');
+const SetMatchHostEvent = require('./SetMatchHostEvent');
+const UpdateMatchPasswordEvent = require('./UpdateMatchPasswordEvent');
+const InviteToMatchEvent = require('./InviteToMatchEvent');
 
 module.exports = {
   LoginEvent,
@@ -43,5 +46,8 @@ module.exports = {
   CreateMatchEvent,
   JoinMatchEvent,
   LeaveMatchEvent,
-  ChangeMatchSettingsEvent
+  ChangeMatchSettingsEvent,
+  SetMatchHostEvent,
+  UpdateMatchPasswordEvent,
+  InviteToMatchEvent
 };

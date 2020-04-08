@@ -1,9 +1,11 @@
-const Parser = require('./Parser');
-const { Type } = require('../Utils/PacketUtils');
+const { ReadString } = require('../Packets/Utils');
 
-const data_template = [
-  { parameter: "message", type: Type.String },
-  { parameter: "channel", type: Type.String }
-];
+module.exports = (packet) => {
+  var message = ReadString(packet, 2).toString();
+  var channel = ReadString(packet, 4 + message.length).toString();
 
-module.exports = (data) => Parser.ParseDataFromTemplate(data, data_template);
+  return {
+    message,
+    channel
+  };
+}
