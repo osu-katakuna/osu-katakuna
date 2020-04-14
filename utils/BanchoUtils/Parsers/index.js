@@ -6,5 +6,6 @@ module.exports = {
 	ChatMessageParser: require('./ChatMessageParser'),
 	UserParser: require('./UserParser'),
 	MatchInformation: require('./MatchInformation'),
-	MatchJoinData: require('./MatchJoinData')
+	MatchJoinData: require('./MatchJoinData'),
+	ScoreFrame: require('./ScoreFrame')
 };

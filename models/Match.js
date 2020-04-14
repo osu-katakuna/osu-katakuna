@@ -47,6 +47,9 @@ class Match {
         slot.userID = user.user_id;
         slot.mods = 0;
         slot.team = 0;
+        slot.loaded = false;
+        slot.skip = false;
+        slot.complete = false;
         this.SetSlot(s, slot);
 
         console.log(`[i] [MP-${this.id}] ${user.username} joined the room.`);
@@ -56,6 +59,139 @@ class Match {
         break;
       }
     }
+  }
+
+  SetMods(user, mods) {
+    console.log(`[i] [MP-${this.id}] Updated mods for ${user.username}.`);
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) this.slots[s].mods = mods;
+    }
+    this.SendUpdate();
+  }
+
+  ToggleTeams(user) {
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) {
+        if(this.slots[s].status == SlotStatus.NotReady) {
+          this.slots[s].status = SlotStatus.Ready;
+        } else {
+          this.slots[s].status = SlotStatus.NotReady;
+        }
+      }
+    }
+    this.SendUpdate();
+  }
+
+  HasBeatmap(user, hasBeatmap) {
+    console.log(`[i] [MP-${this.id}] ${user.username} ${hasBeatmap ? "has" : "does not have"} this beatmap!`);
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) this.slots[s].status = hasBeatmap ? SlotStatus.NotReady : SlotStatus.NoBeatmap;
+    }
+    this.SendUpdate();
+  }
+
+  SetReadyState(user, ready) {
+    console.log(`[i] [MP-${this.id}] ${user.username} updated ready status to ${ready ? "READY" : "NOT_READY"}.`);
+
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) this.slots[s].status = ready ? SlotStatus.Ready : SlotStatus.NotReady;
+    }
+    this.SendUpdate();
+  }
+
+  StartMatch() {
+    if(this.OnlinePlayers < 2) {
+      console.log(`[i] [MP-${this.id}] No enough players to start this match.`);
+      return;
+    }
+    this.inProgress = true;
+
+    console.log(`[i] [MP-${this.id}] ${user.username} is starting the match!`);
+
+    this.slots.forEach(slot => {
+      if(slot.userID == -1) return;
+      slot.status = SlotStatus.Playing;
+      TokenManager.FindUserID(slot.userID).enqueue(Packets.MatchStart(this));
+    });
+
+    this.SendUpdate();
+  }
+
+  SetLoaded(user) {
+    console.log(`[i] [MP-${this.id}] ${user.username} got his beatmap loaded!`);
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) this.slots[s].loaded = true;
+    }
+
+    if(this.slots.filter(s => s.loaded).length == this.OnlinePlayers) {
+      console.log(`[i] [MP-${this.id}] Match will start soon!`);
+      this.slots.forEach(slot => {
+        if(slot.userID == -1) return;
+        TokenManager.FindUserID(slot.userID).enqueue(Packets.AllPlayersLoadedMatch());
+      });
+    }
+
+    this.SendUpdate();
+  }
+
+  UpdateScore(user, score) {
+    console.log(`[i] [MP-${this.id}] Received a score frame update for ${user.username}!`);
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) {
+        score.id = s;
+        break;
+      }
+    }
+
+    this.SendToPlayers(Packets.ScoreFrame(score));
+  }
+
+  FailPlayer(user) {
+    console.log(`[i] [MP-${this.id}] ${user.username} failed!`);
+    var slot = 0;
+
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) {
+        slot = s;
+        break;
+      }
+    }
+
+    this.SendToPlayers(Packets.UserFailed(slot));
+  }
+
+  PlayerCompleted(user) {
+    console.log(`[i] [MP-${this.id}] ${user.username} completed!`);
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) {
+        this.slots[s].complete = true;
+        break;
+      }
+    }
+
+    if(this.slots.filter(s => s.complete).length == this.OnlinePlayers) {
+      console.log(`[i] [MP-${this.id}] All players are done! Match is over.`);
+      this.inProgress = false;
+      for(var s = 0; s < 16; s++) {
+        if(this.slots[s].status == SlotStatus.Playing) {
+          this.slots[s].status = SlotStatus.NotReady;
+          this.slots[s].complete = false;
+          this.slots[s].loaded = false;
+          this.slots[s].skip = false;
+        }
+      }
+      this.SendUpdate();
+      this.SendToPlayers(Packets.MatchComplete());
+    } else {
+      this.SendUpdate();
+    }
+  }
+
+  SendToPlayers(data) {
+    this.slots.forEach(slot => {
+      if(slot.userID == -1) return;
+      TokenManager.FindUserID(slot.userID).enqueue(data);
+    });
   }
 
   RemoveUser(user) {
@@ -127,7 +263,6 @@ class Match {
       if(slot.status != SlotStatus.Free && slot.status != SlotStatus.Locked && slot.userID > 0)
         TokenManager.FindUserID(slot.userID).enqueue(Packets.MatchInfo(this));
     });
-    console.log(this);
   }
 
   SetSlotMods(slot, mods) {

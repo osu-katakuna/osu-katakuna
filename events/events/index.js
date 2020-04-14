@@ -23,6 +23,17 @@ const ChangeMatchSettingsEvent = require('./ChangeMatchSettingsEvent');
 const SetMatchHostEvent = require('./SetMatchHostEvent');
 const UpdateMatchPasswordEvent = require('./UpdateMatchPasswordEvent');
 const InviteToMatchEvent = require('./InviteToMatchEvent');
+const MatchUserChangesModsEvent = require('./MatchUserChangesModsEvent');
+const MatchUserChangesTeamEvent = require('./MatchUserChangesTeamEvent');
+const MatchUserHasBeatmapEvent = require('./MatchUserHasBeatmapEvent');
+const MatchUserHasNoBeatmapEvent = require('./MatchUserHasNoBeatmapEvent');
+const MatchUserReadyEvent = require('./MatchUserReadyEvent');
+const MatchUserNotReadyEvent = require('./MatchUserNotReadyEvent');
+const StartMatchEvent = require('./StartMatchEvent');
+const MatchUserLoadedEvent = require('./MatchUserLoadedEvent');
+const MatchUserScoreEvent = require('./MatchUserScoreEvent');
+const MatchFailedEvent = require('./MatchFailedEvent');
+const MatchCompleteEvent = require('./MatchCompleteEvent');
 
 module.exports = {
   LoginEvent,
@@ -49,5 +60,16 @@ module.exports = {
   ChangeMatchSettingsEvent,
   SetMatchHostEvent,
   UpdateMatchPasswordEvent,
-  InviteToMatchEvent
+  InviteToMatchEvent,
+  MatchUserChangesModsEvent,
+  MatchUserChangesTeamEvent,
+  MatchUserHasBeatmapEvent,
+  MatchUserHasNoBeatmapEvent,
+  MatchUserReadyEvent,
+  MatchUserNotReadyEvent,
+  StartMatchEvent,
+  MatchUserLoadedEvent,
+  MatchUserScoreEvent,
+  MatchFailedEvent,
+  MatchCompleteEvent
 };

@@ -11,7 +11,7 @@ function Parse(value, p) {
     data = ReadString(value, 0);
     offset += data.length == 1 ? 1 : data.length + 2;
   } else if(p.type == Type.Byte) {
-    data = value.readInt8();
+    data = value[offset];
     offset += 1;
   } else if(p.type == Type.Int32) {
     data = value.readInt32LE();

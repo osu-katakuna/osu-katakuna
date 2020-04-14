@@ -19,7 +19,7 @@ function BuildPacket(__packet) {
     if(p.type == Type.String)
       PackString(p.value).copy(packet, offset);
     else if(p.type == Type.Byte)
-      packet.writeInt8(p.value, offset);
+      packet[offset] = p.value;
     else if(p.type == Type.Int32)
       packet.writeInt32LE(p.value, offset);
     else if(p.type == Type.UInt32)

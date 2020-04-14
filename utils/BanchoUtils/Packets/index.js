@@ -25,12 +25,17 @@ const GetChatAttention = require('./Types/GetChatAttention');
 const FriendsList = require('./Types/FriendsList');
 const MatchTransferHost = require('./Types/MatchTransferHost');
 const MatchInfo = require('./Types/MatchInfo');
+const MatchStart = require('./Types/MatchStart');
 const MatchJoinFailure = require('./Types/MatchJoinFailure');
 const MatchJoinSuccess = require('./Types/MatchJoinSuccess');
 const NewMatchInfo = require('./Types/NewMatchInfo');
 const DisposeMatch = require('./Types/DisposeMatch');
 const UpdatePassword = require('./Types/UpdatePassword');
 const InviteMessage = require('./Types/InviteMessage');
+const AllPlayersLoadedMatch = require('./Types/AllPlayersLoadedMatch');
+const ScoreFrame = require('./Types/ScoreFrame');
+const UserFailed = require('./Types/UserFailed');
+const MatchComplete = require('./Types/MatchComplete');
 
 module.exports = {
   Notification,
@@ -60,10 +65,15 @@ module.exports = {
   FriendsList,
   MatchTransferHost,
   MatchInfo,
+  MatchStart,
   NewMatchInfo,
   MatchJoinFailure,
   MatchJoinSuccess,
   DisposeMatch,
   UpdatePassword,
-  InviteMessage
+  InviteMessage,
+  AllPlayersLoadedMatch,
+  ScoreFrame,
+  UserFailed,
+  MatchComplete
 };
