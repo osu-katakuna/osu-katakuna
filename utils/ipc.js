@@ -2,9 +2,11 @@ const ipc = require('node-ipc');
 const Packets = require('./BanchoUtils/Packets')
 const PacketConstant = require('./BanchoUtils/Packets/PacketConstants')
 const Database = require('./Database/');
-const Tokens = require('../global/global').tokens;
+var Tokens = require('../global/global').tokens;
 const User = require('../models/User');
 var uuid = require("uuid").v4;
+
+var registered_avatars = [];
 
 const handlers = [
   {"action": "request", "type": "user", "handler": (id, socket, req) => {
@@ -73,11 +75,17 @@ const handlers = [
     req.user_data.token = id;
     req.user_data.status = {
       "id": PacketConstant.userActions.watching,
-      "text": "Twitch",
+      "text": "the server.",
     };
 
     var user = CreateBotUser(req.user_data);
-    Tokens.AddUserToken(user, id);
+    if(req.user_data.avatar != undefined) {
+      registered_avatars.push({
+        id: req.user_data.id,
+        avatar: req.user_data.avatar
+      });
+    }
+    Tokens.AddBotUserToken(user, id);
     Tokens.EnqueueAll(Packets.UserPanel(user));
     Tokens.EnqueueAll(Packets.UserStats(user));
 
@@ -111,6 +119,10 @@ function CreateBotUser(user) {
   return u;
 }
 
+function GetBotAvatar(uid) {
+  return registered_avatars.filter(b => b.id == uid).length > 0 ? registered_avatars.filter(b => b.id == uid)[0].avatar : null;
+}
+
 function start_ipc(start_cb) {
   ipc.config.id = 'katakuna';
   ipc.config.retry = 1500;
@@ -132,6 +144,7 @@ function start_ipc(start_cb) {
       const bot = Tokens.FindUserToken(id);
       if(bot) {
         console.log(`[i] ${bot.user.username} with id ${id} disconnected! Removing user!`)
+        registered_avatars = registered_avatars.filter(b => b.id != bot.user.id);
         Tokens.RemoveToken(id);
         Tokens.EnqueueAll(Packets.UserLogout(bot.user));
       }
@@ -143,5 +156,6 @@ function start_ipc(start_cb) {
 }
 
 module.exports = {
-  "start_ipc": start_ipc
+  start_ipc,
+  GetBotAvatar
 };

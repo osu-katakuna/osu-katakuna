@@ -7,6 +7,7 @@ class Token {
     this.user = user;
     this.token = token;
     this.queue = [];
+    this.bot = false;
     this.joinedChannels = [];
     this.spectators = [];
     this.spectating_user = -1;

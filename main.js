@@ -21,8 +21,8 @@ var options = {
   cert: fs.readFileSync(Config.certs.certificate)
 };
 
-//app.set('trust proxy', 'loopback')
-//avatar_app.set('trust proxy', 'loopback')
+app.set('trust proxy', 'loopback')
+avatar_app.set('trust proxy', 'loopback')
 
 app.use(function (req, res, next) {
   console.log(`${req.method} ${req.path} - ${req.ip} - ${new Date()} - ${req.get('User-Agent')}`)
@@ -50,20 +50,16 @@ avatar_app.get("/:id", function (req, res, next) {
   console.log(`[AVATAR:${req.params.id}] ${req.ip} - ${new Date()} - ${req.get('User-Agent')}`);
   var user = db.find_user(req.params.id);
   if(!user) {
-    if(ipc.getBotUser(req.params.id)) {
-      var bot = ipc.getBotUser(req.params.id);
-      if(bot.avatar) {
-        var avatar = Buffer.from(bot.avatar, 'base64');
-        res.writeHead(200, {
-         'Content-Type': 'image/png',
-         'Content-Length': avatar.length
-        });
-        res.end(avatar);
-      } else {
-        res.sendFile(path.join(__dirname, './avatars', 'default_avatar.png'));
-      }
+    if(ipc.GetBotAvatar(req.params.id)) {
+      var avatar = Buffer.from(ipc.GetBotAvatar(req.params.id), 'base64');
+      res.writeHead(200, {
+       'Content-Type': 'image/png',
+       'Content-Length': avatar.length
+      });
+      res.end(avatar);
     } else {
-      res.sendFile(path.join(__dirname, './avatars', 'default_avatar.png'));
+      res.write("no avatar");
+      //res.sendFile(path.join(__dirname, './avatars', 'default_avatar.png'));
     }
   } else {
     if(user.avatar != null) {

@@ -14,6 +14,12 @@ function FindUserID(uid) {
   }
 }
 
+function FindBotUserID(uid) {
+  for(var i = 0; i < tokens.length; i++) {
+    if(tokens[i].user.user_id === uid && tokens[i].bot) return tokens[i];
+  }
+}
+
 function FindUserToken(token) {
   for(var i = 0; i < tokens.length; i++) {
     if(tokens[i].token === token) return tokens[i];
@@ -27,6 +33,13 @@ function EnqueueToMultiple(ids, data) {
 function AddUserToken(user, token) {
   tokens.push(new Token(user, token, this));
   console.log(`[i] Token '${token}' registered!`);
+}
+
+function AddBotUserToken(user, token) {
+  var t = new Token(user, token, this);
+  t.bot = true;
+  tokens.push(t);
+  console.log(`[i] Bot Token '${token}' registered!`);
 }
 
 function RemoveToken(token) {
@@ -72,5 +85,7 @@ module.exports = {
   EnqueueToMultiple,
   OnlineUsersTokens,
   EnqueueAllExcept,
-  GetJoinedChannel
+  GetJoinedChannel,
+  FindBotUserID,
+  AddBotUserToken
 };
