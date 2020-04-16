@@ -106,7 +106,7 @@ class Match {
     }
     this.inProgress = true;
 
-    console.log(`[i] [MP-${this.id}] ${user.username} is starting the match!`);
+    console.log(`[i] [MP-${this.id}] Starting the match!`);
 
     this.slots.forEach(slot => {
       if(slot.userID == -1) return;
