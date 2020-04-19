@@ -1,13 +1,8 @@
-var cmd_queue = require("../utils/queue");
-var protocol = require('../utils/bancho_protocol')
-const db = require("../utils/database")
-
 class User {
   constructor() {
     this.username = "";
     this.email = "";
     this.rankedScore = 0;
-    this.totalScore = 0;
     this.timezone = 24;
     this.country = 0;
     this.user_id = 0;
@@ -23,22 +18,16 @@ class User {
     this.actionMods = 0;
 
     this.friends = [];
-  }
-
-  addFriend(id) {
-    db.addFriend(this.user_id, id);
-    this.friends.push(id);
-    cmd_queue.queueTo(this.token.token_id, protocol.generator.friendList(this.friends));
-  }
-
-  removeFriend(id) {
-    db.removeFriend(this.user_id, id);
-    this.friends = this.friends.filter((uid) => uid != id);
-    cmd_queue.queueTo(this.token.token_id, protocol.generator.friendList(this.friends));
+    this.database = null;
+    this.totalScore = 0;
+    this.plays = 0;
+    this.rank = 0;
+    this.accuracy = 0;
+    this.gameMode = 0;
   }
 
   get pp() {
-    return 12345;
+    return 0;
   }
 
   setStatus(id, text, md5, mods) {
@@ -57,22 +46,25 @@ class User {
     };
   }
 
-  get accuracy() {
-    return 100 / 100;
-  }
-
   get stats() {
     return {
       user_id:      this.user_id,
-      rankedScore:  this.rankedScore,
+      rankedScore:  this.totalScore,
       accuracy: 		this.accuracy, // acc proc / 100
-    	playCount: 	  69,
+    	playCount: 	  this.plays,
     	totalScore: 	this.totalScore, // score showed up
     	gameRank: 		this.rank,
     	pp: 			    this.pp,
     	gameMode:     this.gameMode, // OSU!?
       status:       this.status
     };
+  }
+
+  updateStats() {
+    this.plays = this.database.GetPlaysForUserID(this.user_id, this.gameMode);
+    this.totalScore = this.database.GetScoreForUserID(this.user_id, this.gameMode);
+    this.rank = this.database.GetRankPositionForUserID(this.user_id, this.gameMode);
+    this.accuracy = this.database.GetAccuracyForUserID(this.user_id, this.gameMode) / 100;
   }
 
   get silenceTime() {
@@ -85,14 +77,6 @@ class User {
 
   get GMT() {
     return true;
-  }
-
-  get rank() {
-    return 1;
-  }
-
-  get gameMode() {
-    return 0; // osu!
   }
 }
 

@@ -84,6 +84,7 @@ router.post('/', (req, res) => {
 			var packets = ParsePacket(new Buffer.from(req.body));
 			for(var i = 0; i < packets.length; i++) {
 				var data = packets[i].data;
+				console.log(packets[i]);
 				if(!GetEventNameByPacketType(packets[i].type)) {
 					console.log("Received unknown packet:", packets[i]);
 					break;

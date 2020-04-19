@@ -15,7 +15,10 @@ class ChangeActionEvent extends Event {
   run(args) {
     const { res, data, user, token } = args;
     const new_status = Parsers.StatusParser(data);
+    user.gameMode = new_status.gameMode;
+
     user.setStatus(new_status.actionID, new_status.actionText, new_status.actionMD5, new_status.actionMods);
+    user.updateStats();
 
     Tokens.EnqueueAll(Packets.UserStats(user));
   }

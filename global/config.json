@@ -2,16 +2,16 @@
   "database": {
     "host": "localhost",
     "username": "katakuna",
-    "password": "ORMm8WumCg1C0a39",
-    "database": "osu_katakuna"
+    "password": "U9ySiGl9hqdKX9u7grSPn8cmAD1PqqBe",
+    "database": "katakuna"
   },
   "ports": {
-    "web": 443,
-    "avatar": 444
+    "web": 8080,
+    "avatar": 8081
   },
   "certs": {
-    "key": "./key.pem",
-    "certificate": "./cacert.pem"
+    "key": "/katakuna/certs/key.pem",
+    "certificate": "/katakuna/certs/cacert.pem"
   },
   "ipc": true
 }

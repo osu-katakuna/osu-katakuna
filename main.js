@@ -8,11 +8,10 @@ var fs = require('fs');
 var app = express();
 var avatar_app = express();
 var concat = require('concat-stream');
-nocache("./utils/database");
-nocache("./utils/ipc");
-nocache('./routes');
 var db = require("./utils/database");
 var ipc = require("./utils/ipc");
+const Database = require("./utils/Database/");
+var TokenManager = require("./global/global").tokens;
 const EventHandler = require('./events/EventHandler');
 const Config = require('./global/config.json');
 
@@ -74,3 +73,5 @@ https.createServer(options, app).listen(Config.ports.web, () => console.log(`osu
 https.createServer(options, avatar_app).listen(Config.ports.avatar, () => console.log(`osu!katakuna avatar server listening on port ${Config.ports.avatar}`));
 if(Config.ipc == true)
   ipc.start_ipc(() => console.log("IPC server started successfully!"));
+
+Database.RemoveAllTokens();

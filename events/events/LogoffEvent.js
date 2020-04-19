@@ -14,7 +14,10 @@ class LogoffEvent extends Event {
   run(args) {
     const { res, user, token } = args;
 
+    console.log(`[*] ${user.username} logged out of osu!katakuna.`);
+
     token.LeaveAllChannels();
+    Database.RemoveUserTokens(user.user_id);
     Tokens.RemoveToken(token.token);
     Tokens.EnqueueAll(Packets.UserLogout(user));
   }

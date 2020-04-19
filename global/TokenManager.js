@@ -74,6 +74,13 @@ function GetJoinedChannel(channel, user) {
   }
 }
 
+function UpdateStats() {
+  tokens.filter(t => !t.bot).forEach(t => t.user.updateStats());
+  setTimeout(UpdateStats, 5000);
+}
+
+setTimeout(UpdateStats, 5000);
+
 module.exports = {
   FindUsernameToken,
   AddUserToken,

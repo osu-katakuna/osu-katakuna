@@ -16,7 +16,16 @@ class PrivateMessageEvent extends Event {
 
     const message = PacketParser.ChatMessageParser(data);
     console.log(`[*] User ${user.username} sent a private message to ${message.channel}(${message.message})!`);
-    Database.SaveMessage(user, message.message, Tokens.FindUsernameToken(message.channel).user);
+
+    var target_user = Tokens.FindUsernameToken(message.channel);
+    if(!target_user) {
+      console.log(`[i] The targeted user is offline. Sending message to DB.`);
+      target_user = Database.GetUser(message.channel);
+    } else {
+      target_user = target_user.user;
+    }
+
+    Database.SaveMessage(user, message.message, target_user);
   }
 }
 

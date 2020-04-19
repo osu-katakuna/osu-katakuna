@@ -21,6 +21,7 @@ class LoginEvent extends Event {
       Tokens.RemoveToken(old_token.token);
     }
     Tokens.AddUserToken(user, token);
+    user.updateStats();
 
     console.log(`[*] User ${loginData.username} authenticated successfully!`);
     res.write(Packets.Notification(`Welcome to Katakuna, ${loginData.username}!`));

@@ -39,7 +39,6 @@ module.exports = {
   LoginEvent,
   PingEvent,
   StatusUpdateEvent,
-  UserStatusUpdateEvent,
   ChangeActionEvent,
   LogoffEvent,
   SpectateEvent,

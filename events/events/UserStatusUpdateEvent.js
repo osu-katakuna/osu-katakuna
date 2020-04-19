@@ -12,9 +12,9 @@ class UserStatusUpdateEvent extends Event {
   }
 
   run(args) {
-    const { res, user } = args;
+    const { res } = args;
 
-    res.write(Packets.UserStats(user));
+    Tokens.OnlineUsers().forEach(user => res.write(Packets.UserStats(user)));
   }
 }
 
