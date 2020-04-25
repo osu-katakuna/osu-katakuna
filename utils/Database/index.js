@@ -114,7 +114,7 @@ function GetPlaysForUserID(id, gamemode = 0) {
 
 function GetScoreForUserID(id, gamemode = 0) {
   var final_score = 0;
-  var scores = con.query("SELECT * FROM user_plays WHERE user_id = ? AND gameMode = ?", [id, gamemode]);
+  var scores = con.query("SELECT * FROM user_plays WHERE user_id = ? AND gameMode = ? AND pass = 1", [id, gamemode]);
 
   if(scores && scores.length >= 1) {
     scores.forEach(s => final_score += s.score);

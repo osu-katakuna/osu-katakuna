@@ -19,15 +19,19 @@ class User {
 
     this.friends = [];
     this.database = null;
-    this.totalScore = 0;
-    this.plays = 0;
-    this.rank = 0;
-    this.accuracy = 0;
-    this.gameMode = 0;
-  }
 
-  get pp() {
-    return 0;
+    this.gameMode = 0;
+
+    this.cachedStats = [];
+    for(var i = 0; i < 4; i++) {
+      this.cachedStats.push({
+        plays: 0,
+        totalScore: 0,
+        rank: 0,
+        accuracy: 0,
+        pp: 0
+      });
+    }
   }
 
   setStatus(id, text, md5, mods) {
@@ -60,11 +64,33 @@ class User {
     };
   }
 
+  get plays() {
+    return this.cachedStats[this.gameMode].plays;
+  }
+
+  get totalScore() {
+    return this.cachedStats[this.gameMode].totalScore;
+  }
+
+  get rank() {
+    return this.cachedStats[this.gameMode].rank;
+  }
+
+  get accuracy() {
+    return this.cachedStats[this.gameMode].accuracy / 100;
+  }
+
+  get pp() {
+    return 0;
+  }
+
   updateStats() {
-    this.plays = this.database.GetPlaysForUserID(this.user_id, this.gameMode);
-    this.totalScore = this.database.GetScoreForUserID(this.user_id, this.gameMode);
-    this.rank = this.database.GetRankPositionForUserID(this.user_id, this.gameMode);
-    this.accuracy = this.database.GetAccuracyForUserID(this.user_id, this.gameMode) / 100;
+    for(var i = 0; i < 4; i++) {
+      this.cachedStats[i].plays = this.database.GetPlaysForUserID(this.user_id, i);
+      this.cachedStats[i].totalScore = this.database.GetScoreForUserID(this.user_id, i);
+      this.cachedStats[i].rank = this.database.GetRankPositionForUserID(this.user_id, i);
+      this.cachedStats[i].accuracy = this.database.GetAccuracyForUserID(this.user_id, i);
+    }
   }
 
   get silenceTime() {

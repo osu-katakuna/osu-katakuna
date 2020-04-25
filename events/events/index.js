@@ -34,6 +34,9 @@ const MatchUserLoadedEvent = require('./MatchUserLoadedEvent');
 const MatchUserScoreEvent = require('./MatchUserScoreEvent');
 const MatchFailedEvent = require('./MatchFailedEvent');
 const MatchCompleteEvent = require('./MatchCompleteEvent');
+const MatchLockSlotEvent = require('./MatchLockSlotEvent');
+const MatchMoveUserSlotEvent = require('./MatchMoveUserSlotEvent');
+const MatchSkipEvent = require('./MatchSkipEvent');
 
 module.exports = {
   LoginEvent,
@@ -70,5 +73,8 @@ module.exports = {
   MatchUserLoadedEvent,
   MatchUserScoreEvent,
   MatchFailedEvent,
-  MatchCompleteEvent
+  MatchCompleteEvent,
+  MatchLockSlotEvent,
+  MatchMoveUserSlotEvent,
+  MatchSkipEvent
 };

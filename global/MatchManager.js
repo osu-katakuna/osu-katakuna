@@ -97,6 +97,13 @@ function CreateMatch(user, match_data) {
   m.name = match_data.name;
   m.id = GetRandomMatchID();
   m.hostUserID = user.user_id;
+  if(match_data.password == "//private") {
+    match_data.password = "";
+  } else {
+    if(match_data.password.slice(match_data.password.length - 9) == "//private") {
+      match_data.password = match_data.password.slice(0, match_data.password.length - match_data.password.lastIndexOf("//private"));
+    }
+  }
   m.password = match_data.password == "" ? null : match_data.password;
   m.beatmapName = match_data.beatmapName;
   m.beatmapMD5 = match_data.beatmapMD5;

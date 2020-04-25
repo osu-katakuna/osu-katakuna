@@ -61,6 +61,63 @@ class Match {
     }
   }
 
+  ToggleSlotLockState(slot) {
+    if(slot > 16) throw new Error(`Invalid slot number #${slot}; maximum slots are 16;`);
+    var slot_data = this.GetSlot(slot);
+
+    if(slot_data.status == SlotStatus.Locked) slot_data.status = SlotStatus.Free;
+    else slot_data.status = SlotStatus.Locked;
+
+    this.SetSlot(slot, slot_data);
+    this.SendUpdate();
+    TokenManager.FindUserID(this.hostUserID).enqueue(Packets.MatchInfo(this));
+
+    console.log(`[i] [MP-${this.id}] Toggled slot #${slot} lock state.`);
+  }
+
+  SkipRequest(user) {
+    console.log(`[i] [MP-${this.id}] ${user.username} requested to skip. ${this.OnlinePlayers - this.slots.filter(s => s.user_id != -1 && s.skip).length} player(s) are required to skip to continue.`);
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) {
+        const slot = this.GetSlot(s);
+        slot.skip = true;
+        this.SetSlot(s, slot);
+        break;
+      }
+    }
+
+    if(this.slots.filter(s => s.user_id != -1 && s.skip).length == this.OnlinePlayers) {
+      console.log(`[i] [MP-${this.id}] Skipping!`);
+      this.slots.forEach(slot => {
+        if(slot.userID == -1) return;
+        TokenManager.FindUserID(slot.userID).enqueue(Packets.MatchExecuteSkip());
+      });
+    }
+
+    this.SendUpdate();
+  }
+
+  MoveUserToSlot(user, new_slot) {
+    for(var s = 0; s < 16; s++) {
+      if(this.slots[s].userID == user.user_id) {
+        const slot = this.GetSlot(s);
+        this.SetSlot(new_slot, slot);
+        slot.status = SlotStatus.Free;
+        slot.userID = -1;
+        slot.mods = 0;
+        slot.team = 0;
+        slot.loaded = false;
+        slot.skip = false;
+        slot.complete = false;
+        this.SetSlot(s, slot);
+
+        console.log(`[i] [MP-${this.id}] Moved user ${user.username} from slot #${s} to slot #${new_slot}.`);
+        break;
+      }
+    }
+    this.SendUpdate();
+  }
+
   SetMods(user, mods) {
     console.log(`[i] [MP-${this.id}] Updated mods for ${user.username}.`);
     for(var s = 0; s < 16; s++) {

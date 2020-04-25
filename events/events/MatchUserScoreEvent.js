@@ -18,6 +18,7 @@ class MatchUserScoreEvent extends Event {
     console.log(`[*] User ${user.username} sent a match score frame!`);
     const score = Parsers.ScoreFrame(data);
 
+    if(!MatchManager.GetUserJoinedMatch(user)) return;
     MatchManager.GetUserJoinedMatch(user).UpdateScore(user, score);
   }
 }

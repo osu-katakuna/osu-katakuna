@@ -36,6 +36,7 @@ const AllPlayersLoadedMatch = require('./Types/AllPlayersLoadedMatch');
 const ScoreFrame = require('./Types/ScoreFrame');
 const UserFailed = require('./Types/UserFailed');
 const MatchComplete = require('./Types/MatchComplete');
+const MatchExecuteSkip = require('./Types/MatchExecuteSkip');
 
 module.exports = {
   Notification,
@@ -75,5 +76,6 @@ module.exports = {
   AllPlayersLoadedMatch,
   ScoreFrame,
   UserFailed,
-  MatchComplete
+  MatchComplete,
+  MatchExecuteSkip
 };
