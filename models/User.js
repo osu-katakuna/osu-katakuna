@@ -23,7 +23,7 @@ class User {
     this.gameMode = 0;
 
     this.cachedStats = [];
-    for(var i = 0; i < 4; i++) {
+    for(var i = 0; i < 5; i++) {
       this.cachedStats.push({
         plays: 0,
         totalScore: 0,
@@ -81,16 +81,7 @@ class User {
   }
 
   get pp() {
-    return 0;
-  }
-
-  updateStats() {
-    for(var i = 0; i < 4; i++) {
-      this.cachedStats[i].plays = this.database.GetPlaysForUserID(this.user_id, i);
-      this.cachedStats[i].totalScore = this.database.GetScoreForUserID(this.user_id, i);
-      this.cachedStats[i].rank = this.database.GetRankPositionForUserID(this.user_id, i);
-      this.cachedStats[i].accuracy = this.database.GetAccuracyForUserID(this.user_id, i);
-    }
+    return this.cachedStats[this.gameMode].pp;
   }
 
   get silenceTime() {
@@ -102,7 +93,7 @@ class User {
   }
 
   get GMT() {
-    return true;
+    return false;
   }
 }
 

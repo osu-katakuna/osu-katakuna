@@ -18,7 +18,7 @@ class ChangeActionEvent extends Event {
     user.gameMode = new_status.gameMode;
 
     user.setStatus(new_status.actionID, new_status.actionText, new_status.actionMD5, new_status.actionMods);
-    user.updateStats();
+    Tokens.ForceUpdateStats(user.user_id);
 
     Tokens.EnqueueAll(Packets.UserStats(user));
   }

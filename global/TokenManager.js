@@ -1,4 +1,6 @@
 const Token = require('../models/Token');
+const Database = require('../utils/Database/');
+const Packets = require('../utils/BanchoUtils/Packets');
 
 var tokens = [];
 
@@ -74,12 +76,48 @@ function GetJoinedChannel(channel, user) {
   }
 }
 
-function UpdateStats() {
-  tokens.filter(t => !t.bot).forEach(t => t.user.updateStats());
-  setTimeout(UpdateStats, 5000);
+function ForceUpdateStats(user_id) {
+  Database.GetUserStats(user_id).forEach(stat => {
+    var user = FindUserID(user_id) ? FindUserID(stat.user_id).user : undefined;
+    if(user == undefined) return;
+
+    user.cachedStats[stat.gameMode].plays = stat.play_count;
+    user.cachedStats[stat.gameMode].totalScore = stat.score;
+    user.cachedStats[stat.gameMode].rank = stat.rank;
+    user.cachedStats[stat.gameMode].accuracy = stat.accuracy;
+    user.cachedStats[stat.gameMode].pp = stat.pp;
+    EnqueueAllExcept(user_id, Packets.UserStats(user));
+  });
 }
 
-setTimeout(UpdateStats, 5000);
+function UpdateStats() {
+  var stats = Database.GetAllUsersStats();
+  var all_stats = []; // some nice sorting...
+  stats.forEach(stat => {
+    if(all_stats.filter(st => stat.user_id).length == 0) {
+      all_stats.push(stat);
+    } else {
+      all_stats.filter(st => stat.user_id)[0] = stat;
+    }
+  });
+
+  all_stats.forEach(stat => {
+    var user = FindUserID(stat.user_id) ? FindUserID(stat.user_id).user : undefined;
+    if(user == undefined) return;
+
+    user.cachedStats[stat.gameMode].plays = stat.play_count;
+    user.cachedStats[stat.gameMode].totalScore = stat.score;
+    user.cachedStats[stat.gameMode].rank = stat.rank;
+    user.cachedStats[stat.gameMode].accuracy = stat.accuracy;
+    user.cachedStats[stat.gameMode].pp = stat.pp;
+    EnqueueAll(Packets.UserPanel(user));
+    EnqueueAll(Packets.UserStats(user));
+  });
+
+  setTimeout(UpdateStats, 1000);
+}
+
+setTimeout(UpdateStats, 1000);
 
 module.exports = {
   FindUsernameToken,
@@ -94,5 +132,6 @@ module.exports = {
   EnqueueAllExcept,
   GetJoinedChannel,
   FindBotUserID,
-  AddBotUserToken
+  AddBotUserToken,
+  ForceUpdateStats
 };

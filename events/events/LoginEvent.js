@@ -21,7 +21,7 @@ class LoginEvent extends Event {
       Tokens.RemoveToken(old_token.token);
     }
     Tokens.AddUserToken(user, token);
-    user.updateStats();
+    Tokens.ForceUpdateStats(user.user_id);
 
     console.log(`[*] User ${loginData.username} authenticated successfully!`);
     res.write(Packets.Notification(`Welcome to Katakuna, ${loginData.username}!`));
@@ -33,7 +33,6 @@ class LoginEvent extends Event {
     res.write(Packets.UserSupporterGMT(user));
     res.write(Packets.UserPanel(user));
     res.write(Packets.UserStats(user));
-    console.log(user, user.rank, Packets.UserStats(user).toString("hex").toUpperCase())
     res.write(Packets.ChannelInfoEnd());
 
     Tokens.EnqueueAllExcept(user.user_id, Packets.UserPanel(user));
