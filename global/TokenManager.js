@@ -86,33 +86,17 @@ function ForceUpdateStats(user_id) {
     user.cachedStats[stat.gameMode].rank = stat.rank;
     user.cachedStats[stat.gameMode].accuracy = stat.accuracy;
     user.cachedStats[stat.gameMode].pp = stat.pp;
-    EnqueueAllExcept(user_id, Packets.UserStats(user));
   });
 }
 
 function UpdateStats() {
-  var stats = Database.GetAllUsersStats();
-  var all_stats = []; // some nice sorting...
-  stats.forEach(stat => {
-    if(all_stats.filter(st => stat.user_id).length == 0) {
-      all_stats.push(stat);
-    } else {
-      all_stats.filter(st => stat.user_id)[0] = stat;
+  tokens.filter(t => !t.bot).map(t => t.user).forEach(u => {
+    ForceUpdateStats(u.user_id);
+    if(Database.GetUserBanState(u.user_id)) {
+      FindUserID(u.user_id).Ban();
     }
   });
 
-  all_stats.forEach(stat => {
-    var user = FindUserID(stat.user_id) ? FindUserID(stat.user_id).user : undefined;
-    if(user == undefined) return;
-
-    user.cachedStats[stat.gameMode].plays = stat.play_count;
-    user.cachedStats[stat.gameMode].totalScore = stat.score;
-    user.cachedStats[stat.gameMode].rank = stat.rank;
-    user.cachedStats[stat.gameMode].accuracy = stat.accuracy;
-    user.cachedStats[stat.gameMode].pp = stat.pp;
-    EnqueueAll(Packets.UserPanel(user));
-    EnqueueAll(Packets.UserStats(user));
-  });
 
   setTimeout(UpdateStats, 1000);
 }

@@ -13,6 +13,14 @@ class LoginEvent extends Event {
 
   onLoginSuccess(loginData, res, token, ip) {
     const user = Database.GetUser(loginData.username);
+
+    if(user.banned) {
+      console.log(`[*] User ${loginData.username} tried to connect, but it's banned!`);
+      res.write(Packets.Notification(`You are banned on osu!katakuna! Please appeal in our forums at katakuna.cc`));
+      res.write(Packets.LoginBanned());
+      return;
+    }
+
     Database.SetUserToken(user.user_id, token, ip);
     if(Tokens.FindUsernameToken(loginData.username)) {
       console.log(`[-] Found a token referenced to this user! Revoking token.`);

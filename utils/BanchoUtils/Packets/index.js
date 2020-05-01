@@ -2,6 +2,7 @@ const Notification = require('./Types/Notification');
 const UserStats = require('./Types/UserStats');
 const UserPanel = require('./Types/UserPanel');
 const LoginFailure = require('./Types/LoginFailure');
+const LoginBanned = require('./Types/LoginBanned');
 const ChannelInfoEnd = require('./Types/ChannelInfoEnd');
 const ProtocolVersion = require('./Types/ProtocolVersion');
 const SilenceEndTime = require('./Types/SilenceEndTime');
@@ -43,6 +44,7 @@ module.exports = {
   UserStats,
   UserPanel,
   LoginFailure,
+  LoginBanned,
   ChannelInfoEnd,
   ProtocolVersion,
   SilenceEndTime,

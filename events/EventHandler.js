@@ -52,7 +52,6 @@ function MessageQueue(token) {
 			if(_token) from = _token.user;
 			else from = Database.GetUser(m.from_user_id);
 
-			console.log(from)
 			token.SendMessage(from, user.username, m.message);
 			Database.SetMessageSeen(m.id);
 		});
@@ -94,6 +93,9 @@ router.post('/', (req, res) => {
 			MessageQueue(_token);
 			_token.queue.forEach((p) => res.write(p));
 	    _token.resetQueue();
+			if(_token.removeOnNextQuery) {
+				Tokens.RemoveToken(_token.token);
+			}
 		}
 	}
 

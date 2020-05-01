@@ -60,6 +60,11 @@ function GetAllTokens() {
   return con.query("SELECT user_id, token_id, ip FROM tokens");
 }
 
+function GetUserBanState(un) {
+  var q = con.query("SELECT banned FROM users WHERE id = ? LIMIT 1", [un]);
+  return q.length > 0 ? q[0].banned : false;
+}
+
 function GetUser(un) {
   const user = con.query("SELECT * FROM users WHERE username = ? OR id = ? LIMIT 1", [un, un])[0];
 
@@ -72,6 +77,7 @@ function GetUser(un) {
   __user.email = user.email;
   __user.avatar = user.avatar;
   __user.database = this;
+  __user.banned = user.banned;
   if(token_data)
     __user.token = token_data.token_id;
   __user.friends = GetUserFriends(user.id);
@@ -110,5 +116,6 @@ module.exports = {
   GetAllTokens,
   RemoveAllTokens,
   GetAllUsersStats,
-  GetUserStats
+  GetUserStats,
+  GetUserBanState
 };

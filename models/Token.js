@@ -11,6 +11,8 @@ class Token {
     this.joinedChannels = [];
     this.spectators = [];
     this.spectating_user = -1;
+    this.removeOnNextQuery = false;
+    this.banned = false;
 
     this.TokenManager = TokenManager;
   }
@@ -79,6 +81,16 @@ class Token {
 
   LeaveAllChannels() {
     this.joinedChannels.forEach((c) => c.RemoveMember(this.user.user_id));
+  }
+
+  Ban() {
+    if(this.banned) return;
+    if(!this.banned) this.banned = true;
+    console.log(`[i] User ${this.user.username} was banned.`);
+    this.enqueue(Packets.Notification(`You are banned on osu!katakuna! Please appeal in our forums at katakuna.cc`));
+    this.enqueue(Packets.LoginBanned());
+    this.TokenManager.EnqueueAllExcept(this.user.user_id, Packets.UserLogout(this.user));
+    this.removeOnNextQuery = true;
   }
 }
 
