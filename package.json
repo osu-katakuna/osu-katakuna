@@ -16,7 +16,8 @@
     "oppai": "^0.1.19",
     "progress": "^2.0.3",
     "sync-mysql": "^3.0.1",
-    "uuid": "^7.0.2"
+    "uuid": "^7.0.2",
+    "ws": "^7.2.5"
   },
   "devDependencies": {},
   "scripts": {

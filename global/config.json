@@ -7,11 +7,13 @@
   },
   "ports": {
     "web": 8080,
-    "avatar": 8081
+    "avatar": 8081,
+    "websocket": 8082
   },
   "certs": {
     "key": "/katakuna/certs/key.pem",
     "certificate": "/katakuna/certs/cacert.pem"
   },
-  "ipc": true
+  "ipc": true,
+  "websocket": true
 }

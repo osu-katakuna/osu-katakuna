@@ -1,6 +1,8 @@
 const Token = require('../models/Token');
 const Database = require('../utils/Database/');
 const Packets = require('../utils/BanchoUtils/Packets');
+const Config = require('../global/config.json');
+var WebSocket = require("../global/global").websocket;
 
 var tokens = [];
 
@@ -34,6 +36,7 @@ function EnqueueToMultiple(ids, data) {
 
 function AddUserToken(user, token) {
   tokens.push(new Token(user, token, this));
+  UpdateUserStatus(user);
   console.log(`[i] Token '${token}' registered!`);
 }
 
@@ -44,7 +47,23 @@ function AddBotUserToken(user, token) {
   console.log(`[i] Bot Token '${token}' registered!`);
 }
 
+function UpdateUserStatus(user) {
+  if(Config.websocket) {
+    if(WebSocket == undefined) {
+      WebSocket = require("../global/global").websocket;
+    }
+    WebSocket.UpdateUserStatus(user);
+  }
+}
+
 function RemoveToken(token) {
+  if(Config.websocket) {
+    if(WebSocket == undefined) {
+      WebSocket = require("../global/global").websocket;
+    }
+    if(FindUserToken(token))
+      WebSocket.UpdateUserOffline(FindUserToken(token).user);
+  }
   tokens = tokens.filter((t) => t.token != token);
   console.log(`[i] Token '${token}' removed!`);
 }
@@ -117,5 +136,6 @@ module.exports = {
   GetJoinedChannel,
   FindBotUserID,
   AddBotUserToken,
-  ForceUpdateStats
+  ForceUpdateStats,
+  UpdateUserStatus
 };

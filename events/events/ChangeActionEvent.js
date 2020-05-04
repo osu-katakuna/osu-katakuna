@@ -21,6 +21,7 @@ class ChangeActionEvent extends Event {
     Tokens.ForceUpdateStats(user.user_id);
 
     Tokens.EnqueueAll(Packets.UserStats(user));
+    Tokens.UpdateUserStatus(user);
   }
 }
 
