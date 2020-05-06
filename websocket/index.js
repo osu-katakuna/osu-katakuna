@@ -17,20 +17,6 @@ const wss = new WebSocket.Server({
   server
 });
 
-function cl() {
-  if (wss.clients.length == 0) return;
-
-  wss.clients.forEach(cl => {
-    if (!cl.approved) {
-      console.log("Client not approved; deleting", cl.ip);
-      cl.terminate();
-    }
-  });
-
-  if (wss.clients.length == 0) return;
-  setTimeout(cl, 5000);
-}
-
 function ActionToString(actionID) {
   if(actionID == UserActions.idle) return "online";
   if(actionID == UserActions.afk) return "afk";
@@ -83,14 +69,17 @@ function UpdateUserOffline(user) {
   });
 }
 
-function onMessageUpdate(message) {
+async function onMessageUpdate(message) {
   message = JSON.parse(message);
   if (message.action == "listen-user-status") {
-    this.approved = true;
     this.action = "listen-user-status";
     this.listening_user_id = message["user-id"];
-    clients.push(this);
+    if(!this.approved) {
+      clients.push(this);
+      this.approved = true;
+    }
 
+    if(!this.listening_user_id) return;
     var user = Tokens.FindUserID(this.listening_user_id);
 
     if (user) {
@@ -106,10 +95,6 @@ wss.on('connection', (ws, req) => {
   ws.ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(/\s*,\s*/)[0] : req.socket.remoteAddress;
 
   ws.on('message', onMessageUpdate);
-
-  if (wss.clients.length === undefined || wss.clients.length > 0) {
-    setTimeout(cl, 5000);
-  }
 });
 
 wss.on('close', function(c) {
