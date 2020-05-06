@@ -11,7 +11,7 @@ var uuid = require("uuid").v4;
 
 var events = [];
 
-router.get('/', (req, res) => res.send("osu!katakuna is up!"));
+router.get('/', async(req, res) => res.send("osu!katakuna is up!"));
 
 function GetEvent(event) {
 	if(event === undefined) return undefined;
@@ -58,7 +58,7 @@ function MessageQueue(token) {
 	}
 }
 
-router.post('/', (req, res) => {
+router.post('/', async(req, res) => {
 	const event_data = {
 		req,
 		res
@@ -77,8 +77,9 @@ router.post('/', (req, res) => {
 		var _token = Tokens.FindUserToken(token);
 		if(_token === undefined || !_token instanceof Token) {
 			console.log(`[X] Unknown token ${token}. Forcing a login failure!`);
-			res.write(Packets.ServerRestart(0));
+			res.write(Packets.ServerRestart(1000));
 		} else {
+			token.lastEvent = new Date().getTime();
 			var user = _token.user;
 			var packets = ParsePacket(new Buffer.from(req.body));
 			for(var i = 0; i < packets.length; i++) {

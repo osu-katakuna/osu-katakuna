@@ -13,6 +13,7 @@ class Token {
     this.spectating_user = -1;
     this.removeOnNextQuery = false;
     this.banned = false;
+    this.lastEvent = new Date().getTime();
 
     this.TokenManager = TokenManager;
   }

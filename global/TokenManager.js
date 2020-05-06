@@ -109,10 +109,19 @@ function ForceUpdateStats(user_id) {
 }
 
 function UpdateStats() {
-  tokens.filter(t => !t.bot).map(t => t.user).forEach(u => {
-    ForceUpdateStats(u.user_id);
-    if(Database.GetUserBanState(u.user_id)) {
-      FindUserID(u.user_id).Ban();
+  tokens.filter(t => !t.bot).forEach(t => {
+    if((new Date().getTime() - t.lastEvent) >= 120000) { // wait for two minutes
+      console.log(`[x] User ${t.user.username} timed out. Deleting token.`);
+      t.LeaveAllChannels();
+      Database.RemoveUserTokens(t.user.user_id);
+      RemoveToken(t.token);
+      EnqueueAll(Packets.UserLogout(t.user));
+      return;
+    }
+
+    ForceUpdateStats(t.user.user_id);
+    if(Database.GetUserBanState(t.user.user_id)) {
+      FindUserID(t.user.user_id).Ban();
     }
   });
 
