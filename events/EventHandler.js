@@ -11,7 +11,37 @@ var uuid = require("uuid").v4;
 
 var events = [];
 
-router.get('/', async(req, res) => res.send("osu!katakuna is up!"));
+router.get('/', async(req, res) => {
+	res.send(`
+<pre>
+  ____  _______  __\/ \/ \/______ _\/ \/_____ _\/ \/____  ______  ____ _
+ \/ __ \\\/ ___\/ \/ \/ \/ \/ \/\/_\/ __ \`\/ __\/ __ \`\/ \/\/_\/ \/ \/ \/ __ \\\/ __ \`\/
+\/ \/_\/ (__  ) \/_\/ \/_\/ ,< \/ \/_\/ \/ \/_\/ \/_\/ \/ ,< \/ \/_\/ \/ \/ \/ \/ \/_\/ \/
+\\____\/____\/\\__,_(_)_\/|_|\\__,_\/\\__\/\\__,_\/_\/|_|\\__,_\/_\/ \/_\/\\__,_\/
+osu!katakuna - osu!bancho reverse engineered
+osu!bancho (c) ppy Pty Ltd
+
+                 .  o ..
+                 o . o o.o        thy sea is long m8
+                      ...oo
+     bruh dis not       __[]__
+        bancho       __|_o_o_o\\__
+                     \\""""""""""\/
+                      \\. ..  . \/
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Please note that you are not using the official osu!bancho
+servers. Right now, you are using the osu!katakuna private
+server.
+
+osu!katakuna web: <a href=\"https:\/\/katakuna.cc\">https://katakuna.cc<\/a>
+osu! web: <a href=\"https:\/\/osu.ppy.sh\">https://osu.ppy.sh<\/a>
+
+P.S: If you see this page, then osu!katakuna is up and
+running.
+<\/pre>
+	`);
+});
 
 function GetEvent(event) {
 	if(event === undefined) return undefined;
@@ -79,7 +109,10 @@ router.post('/', async(req, res) => {
 			console.log(`[X] Unknown token ${token}. Forcing a login failure!`);
 			res.write(Packets.ServerRestart(1000));
 		} else {
-			token.lastEvent = new Date().getTime();
+			console.log(_token);
+			console.log("Last token update: " + _token.lastEvent);
+			_token.lastEvent = new Date().getTime();
+			console.log("New token update: " + _token.lastEvent);
 			var user = _token.user;
 			var packets = ParsePacket(new Buffer.from(req.body));
 			for(var i = 0; i < packets.length; i++) {
