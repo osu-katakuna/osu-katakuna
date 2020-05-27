@@ -318,7 +318,8 @@ class Match {
     TokenManager.EnqueueToMultiple(PlayersInLobby.filter(x => x != this.hostUserID), Packets.MatchInfo(this));
     this.slots.forEach(slot => {
       if(slot.status != SlotStatus.Free && slot.status != SlotStatus.Locked && slot.userID > 0)
-        TokenManager.FindUserID(slot.userID).enqueue(Packets.MatchInfo(this));
+        if(TokenManager.FindUserID(slot.userID))
+          TokenManager.FindUserID(slot.userID).enqueue(Packets.MatchInfo(this));
     });
   }
 

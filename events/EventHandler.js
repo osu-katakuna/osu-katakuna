@@ -109,7 +109,6 @@ router.post('/', async(req, res) => {
 			console.log(`[X] Unknown token ${token}. Forcing a login failure!`);
 			res.write(Packets.ServerRestart(1000));
 		} else {
-			console.log(_token);
 			console.log("Last token update: " + _token.lastEvent);
 			_token.lastEvent = new Date().getTime();
 			console.log("New token update: " + _token.lastEvent);

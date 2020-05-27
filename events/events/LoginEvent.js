@@ -3,6 +3,7 @@ const Database = require('../../utils/Database/');
 const Packets = require('../../utils/BanchoUtils/Packets');
 const Tokens = require("../../global/global").tokens;
 const ChannelManager = require("../../global/global").channels;
+var crypto = require('crypto');
 
 class LoginEvent extends Event {
   constructor() {
@@ -22,7 +23,7 @@ class LoginEvent extends Event {
     }
 
     Database.SetUserToken(user.user_id, token, ip);
-    if(Tokens.FindUsernameToken(loginData.username)) {
+    if(Tokens.FindUsernameToken(loginData.username) && !loginData.client_build.endsWith("tourney")) {
       console.log(`[-] Found a token referenced to this user! Revoking token.`);
       const old_token = Tokens.FindUsernameToken(loginData.username);
       old_token.LeaveAllChannels();
@@ -65,7 +66,7 @@ class LoginEvent extends Event {
 
   run(args) {
     const { res, loginData, token, ip } = args;
-    if(Database.ValidateLogin(loginData.username, loginData.password)) this.onLoginSuccess(loginData, res, token, ip);
+    if(Database.ValidateLogin(loginData.username, crypto.createHash('sha256').update(loginData.password).digest('hex'))) this.onLoginSuccess(loginData, res, token, ip);
     else this.onLoginFailure(loginData, res);
   }
 }

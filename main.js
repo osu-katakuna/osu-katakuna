@@ -74,4 +74,6 @@ https.createServer(options, avatar_app).listen(Config.ports.avatar, () => consol
 if(Config.ipc == true)
   ipc.start_ipc(() => console.log("IPC server started successfully!"));
 
+require("./spool");
+
 Database.RemoveAllTokens();
