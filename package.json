@@ -13,7 +13,6 @@
     "mysql": "^2.18.1",
     "node-ipc": "^9.1.1",
     "node-ipinfo": "^1.0.1",
-    "oppai": "^0.1.19",
     "progress": "^2.0.3",
     "sync-mysql": "^3.0.1",
     "uuid": "^7.0.2",
