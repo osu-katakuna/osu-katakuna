@@ -1,5 +1,7 @@
 const Packets = require('../utils/BanchoUtils/Packets');
 const Database = require('../utils/Database/');
+const Config = require('../utils/Config');
+require('../utils/string');
 const ChannelManager = require("../global/global").channels;
 
 class Token {
@@ -8,12 +10,14 @@ class Token {
     this.token = token;
     this.queue = [];
     this.bot = false;
+    this.tournament = false;
     this.joinedChannels = [];
     this.spectators = [];
     this.spectating_user = -1;
     this.removeOnNextQuery = false;
     this.banned = false;
     this.lastEvent = new Date().getTime();
+    this.tcpSocket = undefined;
 
     this.TokenManager = TokenManager;
   }
@@ -23,7 +27,11 @@ class Token {
   }
 
   enqueue(packet) {
-    this.queue.push(packet);
+    if(this.tcpSocket == undefined) this.queue.push(packet);
+    else {
+    	console.log("TCP Socket writing packet!");
+    	this.tcpSocket.write(packet);
+    }
   }
 
   SendMessage(from, to, msg) {
@@ -50,34 +58,34 @@ class Token {
   }
 
   sendToSpectators(data) {
-    this.TokenManager.EnqueueToMultiple(this.spectators, data);
+    this.spectators.forEach(x => x.enqueue(data));
   }
 
   spectateUser(user_id) {
     if(this.spectating_user != -1)
       this.stopSpectating();
     this.spectating_user = user_id;
-    this.TokenManager.FindUserID(user_id).addSpectator(this.user.user_id);
+    this.TokenManager.FindUserID(user_id).addSpectator(this);
   }
 
   stopSpectating() {
     if(this.spectating_user == -1) return;
     const t = this.TokenManager.FindUserID(this.spectating_user);
-    if(t)
-      t.removeSpectator(this.user.user_id);
+    if(t) t.removeSpectator(this);
   }
 
-  removeSpectator(user_id) {
-    this.TokenManager.FindUserID(this.user.user_id).enqueue(Packets.SpectatorLeft(user_id));
-    this.sendToSpectators(Packets.FellowSpectatorLeft(user_id));
-    this.spectators = this.spectators.filter((s) => s != user_id);
+  removeSpectator(t) {
+    this.enqueue(Packets.SpectatorLeft(t.user.user_id));
+    this.sendToSpectators(Packets.FellowSpectatorLeft(t.user.user_id));
+    this.spectators = this.spectators.filter((s) => s.token != t.token);
   }
 
-  addSpectator(user_id) {
-    this.TokenManager.FindUserID(this.user.user_id).enqueue(Packets.SpectatorJoined(user_id));
-    this.spectators.forEach((s) => this.TokenManager.FindUserID(user_id).enqueue(Packets.FellowSpectatorJoined(s))); // show fellow spectators
-    this.sendToSpectators(Packets.FellowSpectatorJoined(user_id)); // tell other spectators that we have joined
-    this.spectators.push(user_id);
+  addSpectator(t) {
+    if(t == undefined) return;
+    this.enqueue(Packets.SpectatorJoined(t.user.user_id));
+    this.spectators.forEach((s) => t.enqueue(Packets.FellowSpectatorJoined(s.user.user_id))); // show fellow spectators
+    this.sendToSpectators(Packets.FellowSpectatorJoined(t.user.user_id)); // tell other spectators that we have joined
+    this.spectators.push(t);
   }
 
   LeaveAllChannels() {
@@ -86,12 +94,25 @@ class Token {
 
   Ban() {
     if(this.banned) return;
-    if(!this.banned) this.banned = true;
+    if(!this.banned) {
+      this.banned = true;
+      this.user.banned = true;
+    }
     console.log(`[i] User ${this.user.username} was banned.`);
-    this.enqueue(Packets.Notification(`You are banned on osu!katakuna! Please appeal in our forums at katakuna.cc`));
-    this.enqueue(Packets.LoginBanned());
+
+    var from = {
+      "username": "BanchoBot",
+      "id": "1"
+    };
+
+    if(Config.GetConfig("banned.message").length > 0) {
+      this.enqueue(Packets.Notification(Config.GetConfig("banned.message").formatUnicorn({
+        servername: Config.GetConfig("server.name"),
+        username: this.user.username
+      })));
+    }
+    this.enqueue(Packets.ChatMessage(from, this.user.username, "Your account is currently in restricted mode. For more information, check out [https://katakuna.cc katakuna.cc]."));
     this.TokenManager.EnqueueAllExcept(this.user.user_id, Packets.UserLogout(this.user));
-    this.removeOnNextQuery = true;
   }
 }
 

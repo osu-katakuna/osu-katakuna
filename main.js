@@ -8,12 +8,12 @@ var fs = require('fs');
 var app = express();
 var avatar_app = express();
 var concat = require('concat-stream');
-var db = require("./utils/database");
 var ipc = require("./utils/ipc");
-const Database = require("./utils/Database/");
+var Database = require("./utils/Database/");
 var TokenManager = require("./global/global").tokens;
 const EventHandler = require('./events/EventHandler');
 const Config = require('./global/config.json');
+const ConfigDB = require('./utils/Config');
 
 var options = {
   key: fs.readFileSync(Config.certs.key),
@@ -28,15 +28,15 @@ app.use(function (req, res, next) {
   if(req.get('User-Agent') != 'osu!' && req.method == 'post') {
 	   res.status(400).send("Unauthorized!");
   } else {
-	req.pipe(concat(function(data){
-		req.body = data;
-		next();
-	}));
+  	req.pipe(concat(function(data){
+  		req.body = data;
+  		next();
+  	}));
   }
 })
 app.use(function (err, req, res, next) {
   console.error(err.stack)
-  res.status(500).send('Something broke!')
+  res.status(500).send('Server error!')
 })
 
 app.use(EventHandler.Router);
@@ -47,7 +47,7 @@ avatar_app.get("/:id", function (req, res, next) {
     return;
   }
   console.log(`[AVATAR:${req.params.id}] ${req.ip} - ${new Date()} - ${req.get('User-Agent')}`);
-  var user = db.find_user(req.params.id);
+  var user = Database.GetUser(req.params.id);
   if(!user) {
     if(ipc.GetBotAvatar(req.params.id)) {
       var avatar = Buffer.from(ipc.GetBotAvatar(req.params.id), 'base64');

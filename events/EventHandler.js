@@ -7,6 +7,7 @@ const ParsePacket = require('../utils/BanchoUtils/Parsers/PacketParser');
 const Packets = require("../utils/BanchoUtils/Packets");
 const Tokens = require("../global/global").tokens;
 const Token = require("../models/Token");
+var net = require('net');
 var uuid = require("uuid").v4;
 
 var events = [];
@@ -109,9 +110,7 @@ router.post('/', async(req, res) => {
 			console.log(`[X] Unknown token ${token}. Forcing a login failure!`);
 			res.write(Packets.ServerRestart(1000));
 		} else {
-			console.log("Last token update: " + _token.lastEvent);
 			_token.lastEvent = new Date().getTime();
-			console.log("New token update: " + _token.lastEvent);
 			var user = _token.user;
 			var packets = ParsePacket(new Buffer.from(req.body));
 			for(var i = 0; i < packets.length; i++) {

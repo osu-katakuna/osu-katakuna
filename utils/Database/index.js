@@ -2,13 +2,18 @@ const sync_mysql = require('sync-mysql');
 const mysql = require('mysql');
 const User = require('../../models/User');
 const Config = require('../../global/config.json');
+const CountriesMap = require('../BanchoUtils/Packets/PacketConstants').countryCodes;
 
-var con = new sync_mysql({
+console.log("osu!katakuna database startup. Will perform DB connection right now!");
+
+const con = new sync_mysql({
   host: Config.database.host,
   user: Config.database.username,
   password: Config.database.password,
   database:  Config.database.database
 });
+
+console.log("If you can see this, then probably osu!katakuna managed to connect to the database. Yey! :D");
 
 function GetUserFriends(user_id) {
   return con.query("SELECT * FROM user_friendships WHERE user = ?", [user_id]).map(f => f.friend);
@@ -78,6 +83,7 @@ function GetUser(un) {
   __user.avatar = user.avatar;
   __user.database = this;
   __user.banned = user.banned;
+  __user.country = user.country == null ? 0 : CountriesMap[user.country];
   if(token_data)
     __user.token = token_data.token_id;
   __user.friends = GetUserFriends(user.id);
@@ -102,6 +108,18 @@ function GetUserStats(user_id) {
   return con.query("SELECT * FROM user_stats WHERE user_id = ?", [user_id]);
 }
 
+function GetConfigEntry(name) {
+  return con.query("SELECT value FROM config WHERE name = ? LIMIT 1", [name])[0];
+}
+
+function SetConfigEntry(name, value) {
+  if(GetConfigEntry(name) == undefined) {
+    con.query("INSERT INTO config(name, value) VALUES(?, ?)", [name, value]);
+  } else {
+    con.query("UPDATE config SET name = ?, value = ? WHERE name = ?", [name, value, name]);
+  }
+}
+
 module.exports = {
   GetUser,
   ValidateLogin,
@@ -117,5 +135,7 @@ module.exports = {
   RemoveAllTokens,
   GetAllUsersStats,
   GetUserStats,
-  GetUserBanState
+  GetUserBanState,
+  GetConfigEntry,
+  SetConfigEntry
 };

@@ -56,6 +56,15 @@ function UpdateUserStatus(user) {
   }
 }
 
+function SendSpectatorFrameWS(user, frames) {
+  if(Config.websocket) {
+    if(WebSocket == undefined) {
+      WebSocket = require("../global/global").websocket;
+    }
+    WebSocket.UpdateSpectateUser(user, frames);
+  }
+}
+
 function RemoveToken(token) {
   if(Config.websocket) {
     if(WebSocket == undefined) {
@@ -146,5 +155,6 @@ module.exports = {
   FindBotUserID,
   AddBotUserToken,
   ForceUpdateStats,
-  UpdateUserStatus
+  UpdateUserStatus,
+  SendSpectatorFrameWS
 };

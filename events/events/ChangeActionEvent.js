@@ -15,9 +15,13 @@ class ChangeActionEvent extends Event {
   run(args) {
     const { res, data, user, token } = args;
     const new_status = Parsers.StatusParser(data);
-    user.gameMode = new_status.gameMode;
 
-    user.setStatus(new_status.actionID, new_status.actionText, new_status.actionMD5, new_status.actionMods);
+    if(new_status.actionID <= 13) {
+      user.gameMode = new_status.gameMode;
+
+      user.setStatus(new_status.actionID, new_status.actionText, new_status.actionMD5, new_status.actionMods);
+    }
+    
     Tokens.ForceUpdateStats(user.user_id);
 
     Tokens.EnqueueAll(Packets.UserStats(user));

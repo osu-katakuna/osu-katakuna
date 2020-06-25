@@ -17,13 +17,13 @@ class StopSpectatingEvent extends Event {
     const { user, data, token } = args;
 
     console.log(`[*] User ${user.username} stopped spectating.`);
-    token.stopSpectating();
     if(Tokens.GetJoinedChannel("#spectator", user))
       ChannelManager.KickUser("#spectator", user);
 
     if(token.spectating_user != -1) {
       const spectator = Tokens.FindUserID(token.spectating_user);
-      if(spectator.spectators.length == 0)
+      token.stopSpectating();
+      if(spectator != null && spectator.spectators.length == 0)
         ChannelManager.KickUser("#spectator", spectator.user);
     }
   }

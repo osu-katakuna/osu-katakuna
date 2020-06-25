@@ -16,7 +16,7 @@ class CannotSpectateEvent extends Event {
 
     console.log(`[*] User ${user.username} does not have the beatmap!`);
 
-    Tokens.FindUserID(token.spectating_user).enqueue(Packets.SpectatorNoBeatmap(user));
+    Tokens.FindUserID(token.spectating_user).sendToSpectators(Packets.SpectatorNoBeatmap(user));
   }
 }
 

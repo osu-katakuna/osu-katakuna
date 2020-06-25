@@ -11,6 +11,7 @@ class User {
     this.userRank = 4; // supporter
     this.avatar = "";
     this.token = "";
+    this.banned = false;
 
     this.actionID = 0;
     this.actionText = "";
@@ -89,7 +90,7 @@ class User {
   }
 
   get supporter() {
-    return true;
+    return !this.banned;
   }
 
   get GMT() {

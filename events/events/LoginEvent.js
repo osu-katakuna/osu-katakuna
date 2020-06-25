@@ -3,6 +3,8 @@ const Database = require('../../utils/Database/');
 const Packets = require('../../utils/BanchoUtils/Packets');
 const Tokens = require("../../global/global").tokens;
 const ChannelManager = require("../../global/global").channels;
+const Config = require('../../utils/Config');
+require('../../utils/string');
 var crypto = require('crypto');
 
 class LoginEvent extends Event {
@@ -15,13 +17,6 @@ class LoginEvent extends Event {
   onLoginSuccess(loginData, res, token, ip) {
     const user = Database.GetUser(loginData.username);
 
-    if(user.banned) {
-      console.log(`[*] User ${loginData.username} tried to connect, but it's banned!`);
-      res.write(Packets.Notification(`You are banned on osu!katakuna! Please appeal in our forums at katakuna.cc`));
-      res.write(Packets.LoginBanned());
-      return;
-    }
-
     Database.SetUserToken(user.user_id, token, ip);
     if(Tokens.FindUsernameToken(loginData.username) && !loginData.client_build.endsWith("tourney")) {
       console.log(`[-] Found a token referenced to this user! Revoking token.`);
@@ -32,8 +27,22 @@ class LoginEvent extends Event {
     Tokens.AddUserToken(user, token);
     Tokens.ForceUpdateStats(user.user_id);
 
+    if(user.banned) {
+      console.log(`[*] User ${loginData.username} is banned! too bad :(`);
+      Tokens.FindUserID(user.user_id).Ban();
+      // let's have fun with the user!
+    }
+
+    Tokens.FindUserID(user.user_id).tournament = loginData.client_build.endsWith("tourney");
+
     console.log(`[*] User ${loginData.username} authenticated successfully!`);
-    res.write(Packets.Notification(`Welcome to Katakuna, ${loginData.username}!`));
+
+    if(Config.GetConfig("login.message").length > 0) {
+      res.write(Packets.Notification(Config.GetConfig("login.message").formatUnicorn({
+        servername: Config.GetConfig("server.name"),
+        username: loginData.username
+      })));
+    }
 
     res.write(Packets.SilenceEndTime(user));
     res.write(Packets.UserID(user));
@@ -51,7 +60,7 @@ class LoginEvent extends Event {
     ChannelManager.JoinChannel("#osu", user);
     ChannelManager.JoinChannel("#announce", user);
 
-    Tokens.OnlineUsers().filter(u => u.user_id != user.user_id).forEach((u) => {
+    Tokens.OnlineUsers().filter(u => (u.user_id != user.user_id) && (!u.banned)).forEach((u) => {
       res.write(Packets.UserPanel(u));
       res.write(Packets.UserStats(u));
     });
