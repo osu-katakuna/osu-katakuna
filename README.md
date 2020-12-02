@@ -2,7 +2,9 @@
 osu!katakuna private server
 
 Written in node.js
-STILL WORK IN PROGRESS & EXPERIMENTAL!
+
+# IMPORTANT INFORMATION!
+This is old stack osu! bancho emulator. This will be depredicted soon and will be replaced by https://github.com/osu-katakuna/shiori. Please take all measures to move away from this.
 
 # Setup
 npm install
