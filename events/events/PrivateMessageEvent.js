@@ -3,6 +3,8 @@ const PacketConstant = require('../../utils/BanchoUtils/Packets/PacketConstants'
 const PacketParser = require('../../utils/BanchoUtils/Parsers');
 const Database = require('../../utils/Database/');
 const Tokens = require("../../global/global").tokens;
+const Config = require('../../global/config.json');
+const Misaki = require('../../misaki/bot');
 
 class PrivateMessageEvent extends Event {
   constructor() {
@@ -12,10 +14,15 @@ class PrivateMessageEvent extends Event {
   }
 
   run(args) {
-    const { user, data } = args;
+    const { user, data, token } = args;
 
     const message = PacketParser.ChatMessageParser(data);
     console.log(`[*] User ${user.username} sent a private message to ${message.channel}(${message.message})!`);
+
+    if((Config.misaki && Config.misaki.enabled) && Misaki.getBotUser().username == message.channel) {
+      Misaki.PrivateMessage(token, message.message);
+      return;
+    }
 
     var target_user = Tokens.FindUsernameToken(message.channel);
     if(!target_user) {

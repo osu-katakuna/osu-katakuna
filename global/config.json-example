@@ -15,5 +15,18 @@
     "certificate": "/katakuna/certs/cacert.pem"
   },
   "ipc": true,
-  "websocket": true
+  "websocket": true,
+  "channelNotifyWebhook": {
+    "#osu": "webhook goes here"
+  },
+  "avatarServer": "https://a.yourserver.tld/",
+  "misaki": {
+    "enabled": true,
+    "prefix": "!",
+    "userid": 10,
+    "customStatus": {
+      "status": "watching",
+      "text": "your console."
+    }
+  }
 }

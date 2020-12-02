@@ -1,4 +1,4 @@
-function nocache(module) {require("fs").watchFile(require("path").resolve(module), () => {delete require.cache[require.resolve(module)]})}
+require('./errorLogger');
 
 var express = require('express');
 var path = require('path');
@@ -14,6 +14,7 @@ var TokenManager = require("./global/global").tokens;
 const EventHandler = require('./events/EventHandler');
 const Config = require('./global/config.json');
 const ConfigDB = require('./utils/Config');
+const Packets = require('./utils/BanchoUtils/Packets');
 
 var options = {
   key: fs.readFileSync(Config.certs.key),
@@ -35,9 +36,15 @@ app.use(function (req, res, next) {
   }
 })
 app.use(function (err, req, res, next) {
-  console.error(err.stack)
-  res.status(500).send('Server error!')
+  console.error(err.stack);
+  res.write(Packets.Notification("An internal error has occured in katakuna.\nIf the problem persists, please restart your client."));
 })
+
+app.use("/api/v1/serverStatus", function(req, res) {
+  res.send({
+    result: 1
+  });
+});
 
 app.use(EventHandler.Router);
 
@@ -75,5 +82,6 @@ if(Config.ipc == true)
   ipc.start_ipc(() => console.log("IPC server started successfully!"));
 
 require("./spool");
+require("./yuki");
 
 Database.RemoveAllTokens();

@@ -7,41 +7,14 @@ const ParsePacket = require('../utils/BanchoUtils/Parsers/PacketParser');
 const Packets = require("../utils/BanchoUtils/Packets");
 const Tokens = require("../global/global").tokens;
 const Token = require("../models/Token");
-var net = require('net');
 var uuid = require("uuid").v4;
+var fs = require('fs');
+var path = require('path');
 
 var events = [];
 
 router.get('/', async(req, res) => {
-	res.send(`
-<pre>
-  ____  _______  __\/ \/ \/______ _\/ \/_____ _\/ \/____  ______  ____ _
- \/ __ \\\/ ___\/ \/ \/ \/ \/ \/\/_\/ __ \`\/ __\/ __ \`\/ \/\/_\/ \/ \/ \/ __ \\\/ __ \`\/
-\/ \/_\/ (__  ) \/_\/ \/_\/ ,< \/ \/_\/ \/ \/_\/ \/_\/ \/ ,< \/ \/_\/ \/ \/ \/ \/ \/_\/ \/
-\\____\/____\/\\__,_(_)_\/|_|\\__,_\/\\__\/\\__,_\/_\/|_|\\__,_\/_\/ \/_\/\\__,_\/
-osu!katakuna - osu!bancho reverse engineered
-osu!bancho (c) ppy Pty Ltd
-
-                 .  o ..
-                 o . o o.o        thy sea is long m8
-                      ...oo
-     bruh dis not       __[]__
-        bancho       __|_o_o_o\\__
-                     \\""""""""""\/
-                      \\. ..  . \/
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Please note that you are not using the official osu!bancho
-servers. Right now, you are using the osu!katakuna private
-server.
-
-osu!katakuna web: <a href=\"https:\/\/katakuna.cc\">https://katakuna.cc<\/a>
-osu! web: <a href=\"https:\/\/osu.ppy.sh\">https://osu.ppy.sh<\/a>
-
-P.S: If you see this page, then osu!katakuna is up and
-running.
-<\/pre>
-	`);
+	res.send(fs.readFileSync(path.resolve(path.dirname(require.main.filename), "./global/motd"), 'UTF-8'));
 });
 
 function GetEvent(event) {
@@ -113,6 +86,10 @@ router.post('/', async(req, res) => {
 			_token.lastEvent = new Date().getTime();
 			var user = _token.user;
 			var packets = ParsePacket(new Buffer.from(req.body));
+			var errorShown = false;
+			var err_data = "";
+			var error_code = uuid();
+
 			for(var i = 0; i < packets.length; i++) {
 				var data = packets[i].data;
 				console.log(packets[i]);
@@ -120,13 +97,49 @@ router.post('/', async(req, res) => {
 					console.log("Received unknown packet:", packets[i]);
 					break;
 				}
-				ExecuteEvent(GetEventNameByPacketType(packets[i].type), { res, data, user, ip, token: _token });
+				try {
+					ExecuteEvent(GetEventNameByPacketType(packets[i].type), { res, data, user, ip, token: _token });
+				} catch(err) {
+					if(err_data == "") {
+						err_data = "[Error Log starts here.]\n";
+					}
+					err_data += `==============================================
+Raw Entire Packet Data: ${req.body.toString('hex')}
+Current Packet ID: ${packets[i].type}
+Raw Current Packet Data: ${packets[i].data.toString('hex')}
+Parsed packets: ${packets}
+Current Handled Event: ${GetEventNameByPacketType(packets[i].type)}
+Stack trace:
+${err.stack}
+==============================================`;
+					console.error(`==================================================
+Internal osu!katakuna server error!
+
+${err_data}
+
+Please report to the development team!
+==================================================`);
+					if(!errorShown) {
+						res.write(Packets.ServerError());
+						res.write(Packets.Notification("An internal error has occured inside katakuna.\nIf the problem persists, please restart your client."));
+						res.write(Packets.ChatMessage({
+							username: "KatakunaSystem",
+							user_id: 1
+						}, _token.user.username, `An error has occured. Please report this error code to the development team of osu!katakuna: ${error_code}`));
+						errorShown = true;
+					}
+				}
 			}
 			MessageQueue(_token);
 			_token.queue.forEach((p) => res.write(p));
 	    _token.resetQueue();
 			if(_token.removeOnNextQuery) {
 				Tokens.RemoveToken(_token.token);
+			}
+			if(err_data.length > 0) {
+				fs.writeFile(path.resolve(path.dirname(require.main.filename), "./logs/" + error_code + ".log"), err_data, function (err) {
+					if (err) return console.error(err);
+				});
 			}
 		}
 	}

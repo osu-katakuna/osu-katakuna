@@ -12,6 +12,8 @@ class User {
     this.avatar = "";
     this.token = "";
     this.banned = false;
+    this.showStats = true;
+    this.relax = false;
 
     this.actionID = 0;
     this.actionText = "";
@@ -24,7 +26,7 @@ class User {
     this.gameMode = 0;
 
     this.cachedStats = [];
-    for(var i = 0; i < 5; i++) {
+    for(var i = 0; i < 8; i++) {
       this.cachedStats.push({
         plays: 0,
         totalScore: 0,
@@ -40,14 +42,19 @@ class User {
     this.actionText = text;
     this.actionMD5 = md5;
     this.actionMods = mods;
+    this.relax = (mods & (1 << 7)) > 1;
+  }
+
+  toggleRelax() {
+    this.relax = !this.relax;
   }
 
   get status() {
     return {
       "actionID": this.actionID,
-      "actionText": this.actionText,
+      "actionText": this.relax ? (this.actionText ? this.actionText + " on Relax" : "on Relax") : this.actionText,
       "actionMD5": this.actionMD5,
-      "actionMods": this.actionMods
+      "actionMods": this.relax ? (this.actionMods & (1 << 7)) : this.actionMods
     };
   }
 
@@ -66,23 +73,23 @@ class User {
   }
 
   get plays() {
-    return this.cachedStats[this.gameMode].plays;
+    return this.cachedStats[(this.relax ? 4 : 0) + this.gameMode].plays;
   }
 
   get totalScore() {
-    return this.cachedStats[this.gameMode].totalScore;
+    return this.cachedStats[(this.relax ? 4 : 0) + this.gameMode].totalScore;
   }
 
   get rank() {
-    return this.cachedStats[this.gameMode].rank;
+    return this.cachedStats[(this.relax ? 4 : 0) + this.gameMode].rank;
   }
 
   get accuracy() {
-    return this.cachedStats[this.gameMode].accuracy / 100;
+    return this.cachedStats[(this.relax ? 4 : 0) + this.gameMode].accuracy / 100;
   }
 
   get pp() {
-    return this.cachedStats[this.gameMode].pp;
+    return this.cachedStats[(this.relax ? 4 : 0) + this.gameMode].pp;
   }
 
   get silenceTime() {

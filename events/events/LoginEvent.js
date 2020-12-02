@@ -4,6 +4,8 @@ const Packets = require('../../utils/BanchoUtils/Packets');
 const Tokens = require("../../global/global").tokens;
 const ChannelManager = require("../../global/global").channels;
 const Config = require('../../utils/Config');
+const GConfig = require('../../global/config.json');
+const Misaki = require('../../misaki/bot');
 require('../../utils/string');
 var crypto = require('crypto');
 
@@ -59,6 +61,12 @@ class LoginEvent extends Event {
     ChannelManager.GetAllChannelsDesc().forEach((d) => res.write(Packets.ChannelInfo(d)));
     ChannelManager.JoinChannel("#osu", user);
     ChannelManager.JoinChannel("#announce", user);
+
+    if(GConfig.misaki && GConfig.misaki.enabled) {
+      var bot = Misaki.getBotUser();
+      res.write(Packets.UserPanel(bot));
+      res.write(Packets.UserStats(bot));
+    }
 
     Tokens.OnlineUsers().filter(u => (u.user_id != user.user_id) && (!u.banned)).forEach((u) => {
       res.write(Packets.UserPanel(u));

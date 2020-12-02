@@ -1,4 +1,5 @@
 const TokenManager = require('./TokenManager');
+const Packets = require('../utils/BanchoUtils/Packets');
 const Channel = require('../models/Channel').Channel;
 
 var channels = [];
@@ -22,6 +23,19 @@ function JoinChannel(channel, user) {
   if(!user) return;
   console.log(`[?] Joining channel ${channel} => ${user.user_id}`);
   GetChannel(channel).AddMember(user.user_id);
+}
+
+function AutoJoinChannel(channel, user) {
+  if(channel[0] !== '#') {
+    channel = '#' + channel;
+  }
+  if(!user) return;
+  console.log(`[i] Telling ${user.username} to automatically join the ${channel} channel.`);
+  if(!GetChannel(channel)) {
+    console.log(`[x] wut wut this channel does not exist.`);
+    return;
+  }
+  TokenManager.FindUserID(user.user_id).enqueue(Packets.AutojoinChannel(GetChannel(channel)));
 }
 
 function LeaveChannel(channel, user) {
@@ -81,5 +95,6 @@ module.exports = {
   GetAllChannels,
   JoinChannel,
   KickUser,
-  LeaveChannel
+  LeaveChannel,
+  AutoJoinChannel
 };

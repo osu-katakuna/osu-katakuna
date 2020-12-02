@@ -54,7 +54,7 @@ module.exports = (user) => PacketGenerator.BuildPacket({
     },
     {
       type: PacketGenerator.Type.Int16,
-      value: user.stats.pp
+      value: (user.stats.pp > 32767 ? 32767 : user.stats.pp)
     }
   ]
 });

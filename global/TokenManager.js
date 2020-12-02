@@ -1,4 +1,5 @@
 const Token = require('../models/Token');
+const IRCToken = require('../models/IRCToken');
 const Database = require('../utils/Database/');
 const Packets = require('../utils/BanchoUtils/Packets');
 const Config = require('../global/config.json');
@@ -31,7 +32,14 @@ function FindUserToken(token) {
 }
 
 function EnqueueToMultiple(ids, data) {
-  ids.forEach((id) => FindUserID(id).enqueue(data));
+  ids.forEach((id) => FindUserID(id) != null ? FindUserID(id).enqueue(data) : undefined);
+}
+
+function AddIRCToken(user, token, socket) {
+  user.showStats = false;
+  tokens.push(new IRCToken(user, token, this, socket));
+  UpdateUserStatus(user);
+  console.log(`[i] IRC Token '${token}' registered!`);
 }
 
 function AddUserToken(user, token) {
@@ -125,6 +133,7 @@ function UpdateStats() {
       Database.RemoveUserTokens(t.user.user_id);
       RemoveToken(t.token);
       EnqueueAll(Packets.UserLogout(t.user));
+      if(t instanceof IRCToken) t.Kick(false, "Timed out.");
       return;
     }
 
@@ -143,6 +152,7 @@ setTimeout(UpdateStats, 1000);
 module.exports = {
   FindUsernameToken,
   AddUserToken,
+  AddIRCToken,
   RemoveToken,
   EnqueueAll,
   FindUserToken,

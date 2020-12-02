@@ -2,8 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const Database = require('../utils/Database/');
 const Channels = require('../global/global').channels;
+const Config = require('../global/config.json');
 
-const SPOOL_DIRECTORY = "/var/spool/katakuna"
+const SPOOL_DIRECTORY = Config.windows ? "spool" : "/var/spool/katakuna"
 
 if(!fs.existsSync(SPOOL_DIRECTORY)) {
   console.log(`[SPOOL] Spool directory not found; creating a new spool directory in '${SPOOL_DIRECTORY}'`)
@@ -20,16 +21,19 @@ var actions = {
       return;
     }
 
-    if(!args.User) {
+    if(!args.User && (!args.UseBotID && args.UseBotID.toLowerCase() != 'true')) {
       console.log("[SPOOL] I don't know on whose behalf I should send the message. Define User.");
       return;
     }
 
-    const user = Database.GetUser(args.User);
+    const user = Database.GetUser(!args.UseBotID ? args.User : (Config.misaki && Config.misaki.enabled ? Config.misaki.userid : args.User));
     if(!user) {
       console.log(`[SPOOL] I don't know this user: ${args.User}`);
       return;
     }
+
+    if(args.UseBotID && args.UseBotID.toLowerCase() == 'true')
+      user.username = args.User; // fake username
 
     if(args.Channel[0] === '#') {
       args.Channel = args.Channel.slice(1);

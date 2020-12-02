@@ -17,6 +17,7 @@ const SpectatorJoined = require('./Types/SpectatorJoined');
 const SpectatorLeft = require('./Types/SpectatorLeft');
 const FellowSpectatorJoined = require('./Types/FellowSpectatorJoined');
 const FellowSpectatorLeft = require('./Types/FellowSpectatorLeft');
+const ServerError = require('./Types/ServerError');
 const ServerRestart = require('./Types/ServerRestart');
 const SpectatorNoBeatmap = require('./Types/SpectatorNoBeatmap');
 const ChatMessage = require('./Types/ChatMessage');
@@ -38,6 +39,7 @@ const ScoreFrame = require('./Types/ScoreFrame');
 const UserFailed = require('./Types/UserFailed');
 const MatchComplete = require('./Types/MatchComplete');
 const MatchExecuteSkip = require('./Types/MatchExecuteSkip');
+const SwitchTournamentServer = require('./Types/SwitchTournamentServer');
 
 module.exports = {
   Notification,
@@ -57,6 +59,7 @@ module.exports = {
   SpectatorFrames,
   SpectatorJoined,
   SpectatorLeft,
+  ServerError,
   ServerRestart,
   SpectatorNoBeatmap,
   FellowSpectatorJoined,
@@ -79,5 +82,6 @@ module.exports = {
   ScoreFrame,
   UserFailed,
   MatchComplete,
-  MatchExecuteSkip
+  MatchExecuteSkip,
+  SwitchTournamentServer
 };

@@ -17,6 +17,13 @@ class AddFriendEvent extends Event {
 
     const new_friend = Parsers.UserParser(data);
     const _friend = Tokens.FindUserID(new_friend);
+
+    if(_friend == null) {
+      console.log(`[*] ${user.username} tried to add an inexistend user(ID: ${new_friend}) as a friend.`);
+      token.enqueue(Packets.Notification(`I'm sorry, but you tried to add an inexistent user(ID: ${new_friend}) as an friend.`));
+      return;
+    }
+
     console.log(`[*] ${user.username} added ${_friend.user.username} as a friend.`);
 
     token.AddFriend(_friend.user);

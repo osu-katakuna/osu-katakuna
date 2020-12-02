@@ -15,7 +15,8 @@ class MatchUserReadyEvent extends Event {
   run(args) {
     const { user, data } = args;
 
-    MatchManager.GetUserJoinedMatch(user).SetReadyState(user, true);
+    if(MatchManager.GetUserJoinedMatch(user) != null)
+      MatchManager.GetUserJoinedMatch(user).SetReadyState(user, true);
   }
 }
 

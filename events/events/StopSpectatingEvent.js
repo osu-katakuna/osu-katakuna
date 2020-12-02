@@ -5,6 +5,8 @@ const PacketConstant = require('../../utils/BanchoUtils/Packets/PacketConstants'
 const Tokens = require("../../global/global").tokens;
 const Parsers = require('../../utils/BanchoUtils/Parsers');
 const ChannelManager = require("../../global/global").channels;
+const Config = require('../../global/config.json');
+const Misaki = require('../../misaki/bot');
 
 class StopSpectatingEvent extends Event {
   constructor() {
@@ -17,6 +19,11 @@ class StopSpectatingEvent extends Event {
     const { user, data, token } = args;
 
     console.log(`[*] User ${user.username} stopped spectating.`);
+
+    if((Config.misaki && Config.misaki.enabled) && Misaki.getBotUser().user_id == token.spectating_user) {
+      return;
+    }
+
     if(Tokens.GetJoinedChannel("#spectator", user))
       ChannelManager.KickUser("#spectator", user);
 

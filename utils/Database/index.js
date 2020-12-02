@@ -120,6 +120,16 @@ function SetConfigEntry(name, value) {
   }
 }
 
+function CheckIRCToken(username, token) {
+  var user = con.query("SELECT id FROM users WHERE username = ? LIMIT 1", [username]);
+  if(user.length <= 0) return false;
+
+  var t = con.query("SELECT id FROM irc_token WHERE user_id = ? AND token = ? LIMIT 1", [user[0].id, token]);
+  if(t.length > 0) return true;
+
+  return false;
+}
+
 module.exports = {
   GetUser,
   ValidateLogin,
@@ -137,5 +147,6 @@ module.exports = {
   GetUserStats,
   GetUserBanState,
   GetConfigEntry,
-  SetConfigEntry
+  SetConfigEntry,
+  CheckIRCToken
 };

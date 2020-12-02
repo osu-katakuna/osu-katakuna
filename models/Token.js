@@ -92,6 +92,16 @@ class Token {
     this.joinedChannels.forEach((c) => c.RemoveMember(this.user.user_id));
   }
 
+  Kick(closeClient = false, reason = "") {
+    this.enqueue(Packets.Notification("You have been kicked from this server."));
+    this.enqueue(Packets.LoginFailure());
+    if(closeClient) {
+      this.enqueue(Packets.ForceExit());
+    }
+    this.TokenManager.EnqueueAllExcept(this.user.user_id, Packets.UserLogout(this.user));
+    this.removeOnNextQuery = true;
+  }
+
   Ban() {
     if(this.banned) return;
     if(!this.banned) {
@@ -111,8 +121,21 @@ class Token {
         username: this.user.username
       })));
     }
+
     this.enqueue(Packets.ChatMessage(from, this.user.username, "Your account is currently in restricted mode. For more information, check out [https://katakuna.cc katakuna.cc]."));
     this.TokenManager.EnqueueAllExcept(this.user.user_id, Packets.UserLogout(this.user));
+  }
+
+  rtx(message) {
+    this.enqueue(Packets.Jumpscare(message));
+  }
+
+  OnMemberLeftChannel(ch, user) {
+    console.log("noop");
+  }
+
+  OnMemberJoinedChannel(ch, user) {
+    console.log("noop");
   }
 }
 
