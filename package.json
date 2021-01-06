@@ -5,7 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "adm-zip": "^0.4.14",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "concat-stream": "^2.0.0",
     "express": "^4.17.1",
     "int64-buffer": "^0.99.1007",
